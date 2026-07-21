@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOTO CHEFE - Gerador de Documentos Oficiais</title>
+    
+    <!-- Importando a biblioteca PDF-LIB -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --surface-dark: #1e1e1e;
+            --primary-red: #d32f2f;
+            --primary-red-hover: #b71c1c;
+            --text-main: #ffffff;
+            --text-muted: #b0b0b0;
+            --border-color: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--surface-dark);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .header img {
+            max-width: 180px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            color: var(--text-main);
+            font-size: 22px;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            padding: 12px;
+            background-color: #2a2a2a;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 6px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-red);
+            outline: none;
+            box-shadow: 0 0 5px rgba(211, 47, 47, 0.4);
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #252525;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary-red);
+            margin-top: 5px;
+        }
+
+        .checkbox-container input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-red);
+            cursor: pointer;
+        }
+
+        .checkbox-container label {
+            color: var(--text-main);
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        h3 {
+            color: var(--text-main);
+            font-size: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 15px;
+        }
+        
+        button.btn-gerar {
+            grid-column: 1 / -1;
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button.btn-gerar:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        button.btn-gerar:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        
+        .voltar-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .voltar-btn:hover {
+            color: var(--text-main);
+        }
+
+        #status-msg {
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+            color: var(--primary-red);
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="voltar-btn">← Voltar para o Menu</a>
+
+    <div class="container">
+        <div class="header">
+            <!-- Logotipo oficial da Moto Chefe -->
+            <img src="LOGO MC - BRANCA .png" alt="Moto Chefe Logo">
+            <h1>Gerador Automático de Documentos</h1>
+            <p>Preencha os dados da venda para unificar e gerar os PDFs oficiais</p>
+        </div>
+
+        <form id="form-documentos" class="form-grid">
+            <div class="form-group full-width"><h3>Dados do Cliente</h3></div>
+            <div class="form-group full-width"><label>Nome Completo (Razão Social)</label><input type="text" id="in_nome" required></div>
+            <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="in_cpf" required></div>
+            <div class="form-group"><label>RG / I.E.</label><input type="text" id="in_rg"></div>
+            <div class="form-group full-width"><label>Endereço com Número</label><input type="text" id="in_endereco"></div>
+            <div class="form-group"><label>Bairro</label><input type="text" id="in_bairro"></div>
+            <div class="form-group"><label>Cidade</label><input type="text" id="in_cidade"></div>
+            <div class="form-group"><label>Estado (UF)</label><input type="text" id="in_estado" maxlength="2"></div>
+            
+            <div class="form-group full-width checkbox-container">
+                <input type="checkbox" id="in_maringa" checked>
+                <label for="in_maringa">Cliente é de Maringá ou Região? (Usa a cartilha específica de Maringá)</label>
+            </div>
+
+            <div class="form-group full-width"><h3>Dados do Veículo</h3></div>
+            <div class="form-group"><label>Data da Venda</label><input type="date" id="in_data" required></div>
+            <div class="form-group"><label>Produto</label>
+                <select id="in_produto">
+                    <option value="Autopropelido">Autopropelido</option>
+                    <option value="Ciclomotor">Ciclomotor</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Modelo do Guia</label>
+                <select id="in_modelo">
+                    <option value="BIKE POP">BIKE POP</option>
+                    <option value="JET MAX">JET MAX</option>
+                    <option value="JET">JET</option>
+                    <option value="JOY SUPER">JOY SUPER</option>
+                    <option value="MC20">MC20</option>
+                    <option value="MIA">MIA</option>
+                    <option value="PITICA">PITICA</option>
+                    <option value="RET">RET</option>
+                    <option value="SOMA">SOMA</option>
+                    <option value="X11">X11</option>
+                    <option value="X12">X12</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Potência</label>
+                <select id="in_potencia">
+                    <option value="500W">500W</option>
+                    <option value="800W">800W</option>
+                    <option value="1000W">1000W</option>
+                    <option value="2000W">2000W</option>
+                    <option value="3000W">3000W</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Cor</label><input type="text" id="in_cor"></div>
+            <div class="form-group"><label>Chassi</label><input type="text" id="in_chassi" required></div>
+            <div class="form-group"><label>Motor</label><input type="text" id="in_motor" required></div>
+
+            <button type="submit" class="btn-gerar" id="btn-gerar">Gerar Documentos PDF</button>
+            <div id="status-msg" class="form-group full-width"></div>
+        </form>
+    </div>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+
+        document.getElementById('form-documentos').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btnGerar = document.getElementById('btn-gerar');
+            const statusMsg = document.getElementById('status-msg');
+            btnGerar.disabled = true;
+            statusMsg.textContent = "Unificando documentos... Aguarde.";
+
+            const dataCrua = document.getElementById('in_data').value;
+            const dataFormatada = dataCrua ? `${dataCrua.split('-')[2]}/${dataCrua.split('-')[1]}/${dataCrua.split('-')[0]}` : "";
+            
+            const modeloSelecionado = document.getElementById('in_modelo').value;
+            const isMaringa = document.getElementById('in_maringa').checked;
+
+            const dados = {
+                NomeCliente: document.getElementById('in_nome').value.toUpperCase(),
+                CpfCnpj: document.getElementById('in_cpf').value,
+                RgCliente: document.getElementById('in_rg').value,
+                EndCliente: document.getElementById('in_endereco').value.toUpperCase(),
+                BairroCliente: document.getElementById('in_bairro').value.toUpperCase(),
+                CidadeCliente: document.getElementById('in_cidade').value.toUpperCase(),
+                EstadoCliente: document.getElementById('in_estado').value.toUpperCase(),
+                DataVenda: dataFormatada,
+                Produto: document.getElementById('in_produto').value.toUpperCase(),
+                Potencia: document.getElementById('in_potencia').value,
+                Modelo: modeloSelecionado,
+                Cor: document.getElementById('in_cor').value.toUpperCase(),
+                Chassi: document.getElementById('in_chassi').value.toUpperCase(),
+                Motor: document.getElementById('in_motor').value.toUpperCase()
+            };
+
+            const arquivos = [
+                'documentos/CERTIFICADO DE GARANTIA.pdf',
+                'documentos/TERMO DE RESPONSABILIDADE AUTOPROPELIDO.pdf'
+            ];
+
+            arquivos.push(`documentos/GUIA CUIDE BEM ${modeloSelecionado}.pdf`);
+
+            if(isMaringa) {
+                arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
+            } else {
+                arquivos.push('documentos/Cartilha de Uso da Bateria.pdf');
+            }
+
+            try {
+                const pdfMestre = await PDFDocument.create();
+
+                for (const url of arquivos) {
+                    try {
+                        const resposta = await fetch(url);
+                        if (!resposta.ok) throw new Error(`Arquivo não encontrado: ${url}`);
+                        
+                        const pdfBytes = await resposta.arrayBuffer();
+                        const pdfDoc = await PDFDocument.load(pdfBytes);
+                        
+                        try {
+                            const form = pdfDoc.getForm();
+                            for (const [nomeCampo, valor] of Object.entries(dados)) {
+                                try {
+                                    const field = form.getTextField(nomeCampo);
+                                    if (field) field.setText(valor);
+                                } catch (err) {}
+                            }
+                            form.flatten();
+                        } catch (errForm) {}
+
+                        const paginasCopiadas = await pdfMestre.copyPages(pdfDoc, pdfDoc.getPageIndices());
+                        paginasCopiadas.forEach((page) => pdfMestre.addPage(page));
+
+                    } catch (erroArquivo) {
+                        console.warn(erroArquivo);
+                    }
+                }
+
+                const pdfFinalBytes = await pdfMestre.save();
+                const blob = new Blob([pdfFinalBytes], { type: 'application/pdf' });
+                const blobUrl = URL.createObjectURL(blob);
+                
+                statusMsg.textContent = "Documentos gerados com sucesso!";
+                window.open(blobUrl, '_blank');
+
+            } catch (erroGeral) {
+                console.error(erroGeral);
+                statusMsg.textContent = "Erro ao processar os arquivos.";
+            } finally {
+                btnGerar.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
