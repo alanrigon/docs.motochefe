@@ -235,97 +235,103 @@
         </form>
     </div>
 
-    <script>
-        const { PDFDocument } = PDFLib;
+<script>
+  const { PDFDocument } = PDFLib;
 
-        document.getElementById('form-documentos').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const btnGerar = document.getElementById('btn-gerar');
-            const statusMsg = document.getElementById('status-msg');
-            btnGerar.disabled = true;
-            statusMsg.textContent = "Unificando documentos... Aguarde.";
+  document.getElementById('form-documentos').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-            const dataCrua = document.getElementById('in_data').value;
-            const dataFormatada = dataCrua ? `${dataCrua.split('-')[2]}/${dataCrua.split('-')[1]}/${dataCrua.split('-')[0]}` : "";
-            
-            const modeloSelecionado = document.getElementById('in_modelo').value;
-            const isMaringa = document.getElementById('in_maringa').checked;
+    const btnGerar = document.getElementById('btn-gerar');
+    const statusMsg = document.getElementById('status-msg');
 
-            const dados = {
-                NomeCliente: document.getElementById('in_nome').value.toUpperCase(),
-                CpfCnpj: document.getElementById('in_cpf').value,
-                RgCliente: document.getElementById('in_rg').value,
-                EndCliente: document.getElementById('in_endereco').value.toUpperCase(),
-                BairroCliente: document.getElementById('in_bairro').value.toUpperCase(),
-                CidadeCliente: document.getElementById('in_cidade').value.toUpperCase(),
-                EstadoCliente: document.getElementById('in_estado').value.toUpperCase(),
-                DataVenda: dataFormatada,
-                Produto: document.getElementById('in_produto').value.toUpperCase(),
-                Potencia: document.getElementById('in_potencia').value,
-                Modelo: modeloSelecionado,
-                Cor: document.getElementById('in_cor').value.toUpperCase(),
-                Chassi: document.getElementById('in_chassi').value.toUpperCase(),
-                Motor: document.getElementById('in_motor').value.toUpperCase()
-            };
+    btnGerar.disabled = true;
+    statusMsg.textContent = "Unificando documentos... Aguarde.";
 
-            const arquivos = [
-                'documentos/CERTIFICADO DE GARANTIA.pdf',
-                'documentos/TERMO DE RESPONSABILIDADE AUTOPROPELIDO.pdf'
-            ];
+    const dataCrua = document.getElementById('in_data').value;
+    const dataFormatada = dataCrua ? `${dataCrua.split('-')[2]}/${dataCrua.split('-')[1]}/${dataCrua.split('-')[0]}` : "";
+    const modeloSelecionado = document.getElementById('in_modelo').value;
+    const isMaringa = document.getElementById('in_maringa').checked;
 
-            arquivos.push(`documentos/GUIA CUIDE BEM ${modeloSelecionado}.pdf`);
+    const dados = {
+      NomeCliente: document.getElementById('in_nome').value.toUpperCase(),
+      CpfCnpj: document.getElementById('in_cpf').value,
+      RgCliente: document.getElementById('in_rg').value,
+      EndCliente: document.getElementById('in_endereco').value.toUpperCase(),
+      BairroCliente: document.getElementById('in_bairro').value.toUpperCase(),
+      CidadeCliente: document.getElementById('in_cidade').value.toUpperCase(),
+      EstadoCliente: document.getElementById('in_estado').value.toUpperCase(),
+      DataVenda: dataFormatada,
+      Produto: document.getElementById('in_produto').value.toUpperCase(),
+      Potencia: document.getElementById('in_potencia').value,
+      Modelo: modeloSelecionado,
+      Cor: document.getElementById('in_cor').value.toUpperCase(),
+      Chassi: document.getElementById('in_chassi').value.toUpperCase(),
+      Motor: document.getElementById('in_motor').value.toUpperCase()
+    };
 
-            if(isMaringa) {
-                arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
-            } else {
-                arquivos.push('documentos/Cartilha de Uso da Bateria.pdf');
+    // Documentos padrão
+    const arquivos = [
+      'documentos/CERTIFICADO DE GARANTIA.pdf',
+      'documentos/TERMO DE RESPONSABILIDADE AUTOPROPELIDO.pdf'
+    ];
+
+    // Guia Cuide Bem do modelo específico
+    arquivos.push(`documentos/GUIA CUIDE BEM ${modeloSelecionado}.pdf`);
+
+    // Lógica das Cartilhas de Bateria (2 cópias em ambos os casos):
+    if (isMaringa) {
+      // 2 cópias da cartilha específica de Maringá
+      arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
+      arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
+    } else {
+      // 2 cópias da cartilha padrão para fora de Maringá
+      arquivos.push('documentos/Cartilha de Uso da Bateria.pdf');
+      arquivos.push('documentos/Cartilha de Uso da Bateria.pdf');
+    }
+
+    try {
+      const pdfMestre = await PDFDocument.create();
+
+      for (const url of arquivos) {
+        try {
+          const resposta = await fetch(url);
+          if (!resposta.ok) throw new Error(`Arquivo não encontrado: ${url}`);
+          
+          const pdfBytes = await resposta.arrayBuffer();
+          const pdfDoc = await PDFDocument.load(pdfBytes);
+
+          try {
+            const form = pdfDoc.getForm();
+            for (const [nomeCampo, valor] of Object.entries(dados)) {
+              try {
+                const field = form.getTextField(nomeCampo);
+                if (field) field.setText(valor);
+              } catch (err) {}
             }
+            form.flatten();
+          } catch (errForm) {}
 
-            try {
-                const pdfMestre = await PDFDocument.create();
+          const paginasCopiadas = await pdfMestre.copyPages(pdfDoc, pdfDoc.getPageIndices());
+          paginasCopiadas.forEach((page) => pdfMestre.addPage(page));
+        } catch (erroArquivo) {
+          console.warn(erroArquivo);
+        }
+      }
 
-                for (const url of arquivos) {
-                    try {
-                        const resposta = await fetch(url);
-                        if (!resposta.ok) throw new Error(`Arquivo não encontrado: ${url}`);
-                        
-                        const pdfBytes = await resposta.arrayBuffer();
-                        const pdfDoc = await PDFDocument.load(pdfBytes);
-                        
-                        try {
-                            const form = pdfDoc.getForm();
-                            for (const [nomeCampo, valor] of Object.entries(dados)) {
-                                try {
-                                    const field = form.getTextField(nomeCampo);
-                                    if (field) field.setText(valor);
-                                } catch (err) {}
-                            }
-                            form.flatten();
-                        } catch (errForm) {}
+      const pdfFinalBytes = await pdfMestre.save();
+      const blob = new Blob([pdfFinalBytes], { type: 'application/pdf' });
+      const blobUrl = URL.createObjectURL(blob);
 
-                        const paginasCopiadas = await pdfMestre.copyPages(pdfDoc, pdfDoc.getPageIndices());
-                        paginasCopiadas.forEach((page) => pdfMestre.addPage(page));
+      statusMsg.textContent = "Documentos gerados com sucesso!";
+      window.open(blobUrl, '_blank');
 
-                    } catch (erroArquivo) {
-                        console.warn(erroArquivo);
-                    }
-                }
-
-                const pdfFinalBytes = await pdfMestre.save();
-                const blob = new Blob([pdfFinalBytes], { type: 'application/pdf' });
-                const blobUrl = URL.createObjectURL(blob);
-                
-                statusMsg.textContent = "Documentos gerados com sucesso!";
-                window.open(blobUrl, '_blank');
-
-            } catch (erroGeral) {
-                console.error(erroGeral);
-                statusMsg.textContent = "Erro ao processar os arquivos.";
-            } finally {
-                btnGerar.disabled = false;
-            }
-        });
-    </script>
+    } catch (erroGeral) {
+      console.error(erroGeral);
+      statusMsg.textContent = "Erro ao processar os arquivos.";
+    } finally {
+      btnGerar.disabled = false;
+    }
+  });
+</script>
 </body>
 </html>
