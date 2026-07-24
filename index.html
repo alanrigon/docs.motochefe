@@ -179,62 +179,67 @@
             <p>Preencha os dados da venda para unificar e gerar os PDFs oficiais</p>
         </div>
 
-        <form id="form-documentos" class="form-grid">
-            <div class="form-group full-width"><h3>Dados do Cliente</h3></div>
-            <div class="form-group full-width"><label>Nome Completo (Razão Social)</label><input type="text" id="in_nome" required></div>
-            <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="in_cpf" required></div>
-            <div class="form-group"><label>RG / I.E.</label><input type="text" id="in_rg"></div>
-            <div class="form-group full-width"><label>Endereço com Número</label><input type="text" id="in_endereco"></div>
-            <div class="form-group"><label>Bairro</label><input type="text" id="in_bairro"></div>
-            <div class="form-group"><label>Cidade</label><input type="text" id="in_cidade"></div>
-            <div class="form-group"><label>Estado (UF)</label><input type="text" id="in_estado" maxlength="2"></div>
-            
-            <div class="form-group full-width checkbox-container">
-                <input type="checkbox" id="in_maringa" checked>
-                <label for="in_maringa">Cliente é de Maringá ou Região? (Usa a cartilha específica de Maringá)</label>
-            </div>
+<!-- CÓDIGO HTML DO FORMULÁRIO COM O NOVO CAMPO -->
+<form id="form-documentos" class="form-grid">
+  <div class="form-group full-width"><h3>Dados do Cliente</h3></div>
+  <div class="form-group full-width"><label>Nome Completo (Razão Social)</label><input type="text" id="in_nome" required></div>
+  <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="in_cpf" required></div>
+  <div class="form-group"><label>RG / I.E.</label><input type="text" id="in_rg"></div>
+  <div class="form-group full-width"><label>Endereço com Número</label><input type="text" id="in_endereco"></div>
+  <div class="form-group"><label>Bairro</label><input type="text" id="in_bairro"></div>
+  <div class="form-group"><label>Cidade</label><input type="text" id="in_cidade"></div>
+  <div class="form-group"><label>Estado (UF)</label><input type="text" id="in_estado" maxlength="2"></div>
+  
+  <div class="form-group full-width checkbox-container">
+    <input type="checkbox" id="in_maringa" checked>
+    <label for="in_maringa">Cliente é de Maringá ou Região? (Usa a cartilha específica de Maringá)</label>
+  </div>
 
-            <div class="form-group full-width"><h3>Dados do Veículo</h3></div>
-            <div class="form-group"><label>Data da Venda</label><input type="date" id="in_data" required></div>
-            <div class="form-group"><label>Produto</label>
-                <select id="in_produto">
-                    <option value="Autopropelido">Autopropelido</option>
-                    <option value="Ciclomotor">Ciclomotor</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Modelo do Guia</label>
-                <select id="in_modelo">
-                    <option value="BIKE POP">BIKE POP</option>
-                    <option value="JET MAX">JET MAX</option>
-                    <option value="JET">JET</option>
-                    <option value="JOY SUPER">JOY SUPER</option>
-                    <option value="MC20">MC20</option>
-                    <option value="MIA">MIA</option>
-                    <option value="PITICA">PITICA</option>
-                    <option value="RET">RET</option>
-                    <option value="SOMA">SOMA</option>
-                    <option value="X11">X11</option>
-                    <option value="X12">X12</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Potência</label>
-                <select id="in_potencia">
-                    <option value="500W">500W</option>
-                    <option value="800W">800W</option>
-                    <option value="1000W">1000W</option>
-                    <option value="2000W">2000W</option>
-                    <option value="3000W">3000W</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Cor</label><input type="text" id="in_cor"></div>
-            <div class="form-group"><label>Chassi</label><input type="text" id="in_chassi" required></div>
-            <div class="form-group"><label>Motor</label><input type="text" id="in_motor" required></div>
+  <div class="form-group full-width"><h3>Dados do Veículo</h3></div>
+  <div class="form-group"><label>Data da Venda</label><input type="date" id="in_data" required></div>
+  
+  <!-- NOVO CAMPO: Nota Fiscal -->
+  <div class="form-group"><label>Número da Nota Fiscal</label><input type="text" id="in_nota_fiscal"></div>
+  
+  <div class="form-group"><label>Produto</label>
+    <select id="in_produto">
+      <option value="Autopropelido">Autopropelido</option>
+      <option value="Ciclomotor">Ciclomotor</option>
+    </select>
+  </div>
+  <div class="form-group"><label>Modelo do Guia</label>
+    <select id="in_modelo">
+      <option value="BIKE POP">BIKE POP</option>
+      <option value="JET MAX">JET MAX</option>
+      <option value="JET">JET</option>
+      <option value="JOY SUPER">JOY SUPER</option>
+      <option value="MC20">MC20</option>
+      <option value="MIA">MIA</option>
+      <option value="PITICA">PITICA</option>
+      <option value="RET">RET</option>
+      <option value="SOMA">SOMA</option>
+      <option value="X11">X11</option>
+      <option value="X12">X12</option>
+    </select>
+  </div>
+  <div class="form-group"><label>Potência</label>
+    <select id="in_potencia">
+      <option value="500W">500W</option>
+      <option value="800W">800W</option>
+      <option value="1000W">1000W</option>
+      <option value="2000W">2000W</option>
+      <option value="3000W">3000W</option>
+    </select>
+  </div>
+  <div class="form-group"><label>Cor</label><input type="text" id="in_cor"></div>
+  <div class="form-group"><label>Chassi</label><input type="text" id="in_chassi" required></div>
+  <div class="form-group"><label>Motor</label><input type="text" id="in_motor" required></div>
 
-            <button type="submit" class="btn-gerar" id="btn-gerar">Gerar Documentos PDF</button>
-            <div id="status-msg" class="form-group full-width"></div>
-        </form>
-    </div>
+  <button type="submit" class="btn-gerar" id="btn-gerar">Gerar Documentos PDF</button>
+  <div id="status-msg" class="form-group full-width"></div>
+</form>
 
+<!-- SCRIPT ATUALIZADO -->
 <script>
   const { PDFDocument } = PDFLib;
 
@@ -261,6 +266,7 @@
       CidadeCliente: document.getElementById('in_cidade').value.toUpperCase(),
       EstadoCliente: document.getElementById('in_estado').value.toUpperCase(),
       DataVenda: dataFormatada,
+      NotaFiscal: document.getElementById('in_nota_fiscal').value.toUpperCase(), // Adicionado aqui
       Produto: document.getElementById('in_produto').value.toUpperCase(),
       Potencia: document.getElementById('in_potencia').value,
       Modelo: modeloSelecionado,
@@ -280,11 +286,9 @@
 
     // Lógica das Cartilhas de Bateria (2 cópias em ambos os casos):
     if (isMaringa) {
-      // 2 cópias da cartilha específica de Maringá
       arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
       arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
     } else {
-      // 2 cópias da cartilha padrão para fora de Maringá
       arquivos.push('documentos/Cartilha de Uso da Bateria.pdf');
       arquivos.push('documentos/Cartilha de Uso da Bateria.pdf');
     }
