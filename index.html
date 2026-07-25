@@ -179,7 +179,6 @@
             <p>Preencha os dados da venda para unificar e gerar os PDFs oficiais</p>
         </div>
 
-<!-- CÓDIGO HTML DO FORMULÁRIO COM O NOVO CAMPO -->
 <form id="form-documentos" class="form-grid">
   <div class="form-group full-width"><h3>Dados do Cliente</h3></div>
   <div class="form-group full-width"><label>Nome Completo (Razão Social)</label><input type="text" id="in_nome" required></div>
@@ -198,7 +197,6 @@
   <div class="form-group full-width"><h3>Dados do Veículo</h3></div>
   <div class="form-group"><label>Data da Venda</label><input type="date" id="in_data" required></div>
   
-  <!-- NOVO CAMPO: Nota Fiscal -->
   <div class="form-group"><label>Número da Nota Fiscal</label><input type="text" id="in_nota_fiscal"></div>
   
   <div class="form-group"><label>Produto</label>
@@ -239,7 +237,6 @@
   <div id="status-msg" class="form-group full-width"></div>
 </form>
 
-<!-- SCRIPT ATUALIZADO -->
 <script>
   const { PDFDocument } = PDFLib;
 
@@ -266,7 +263,7 @@
       CidadeCliente: document.getElementById('in_cidade').value.toUpperCase(),
       EstadoCliente: document.getElementById('in_estado').value.toUpperCase(),
       DataVenda: dataFormatada,
-      NotaFiscal: document.getElementById('in_nota_fiscal').value.toUpperCase(), // Adicionado aqui
+      NotaFiscal: document.getElementById('in_nota_fiscal').value.toUpperCase(),
       Produto: document.getElementById('in_produto').value.toUpperCase(),
       Potencia: document.getElementById('in_potencia').value,
       Modelo: modeloSelecionado,
@@ -275,22 +272,23 @@
       Motor: document.getElementById('in_motor').value.toUpperCase()
     };
 
-    // Documentos padrão
+    // Documentos padrão (Termo de Responsabilidade duplicado para gerar 2 vias)
     const arquivos = [
       'documentos/CERTIFICADO DE GARANTIA.pdf',
+      'documentos/TERMO DE RESPONSABILIDADE AUTOPROPELIDO.pdf',
       'documentos/TERMO DE RESPONSABILIDADE AUTOPROPELIDO.pdf'
     ];
 
     // Guia Cuide Bem do modelo específico
     arquivos.push(`documentos/GUIA CUIDE BEM ${modeloSelecionado}.pdf`);
 
-    // Lógica das Cartilhas de Bateria (2 cópias em ambos os casos):
+    // Lógica das Cartilhas de Bateria (2 cópias para cada situação)
     if (isMaringa) {
       arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
       arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
     } else {
-      arquivos.push('documentos/Cartilha de Uso da Bateria.pdf');
-      arquivos.push('documentos/Cartilha de Uso da Bateria.pdf');
+      arquivos.push('documentos/CARTILHA DE USO DE BATERIA.pdf');
+      arquivos.push('documentos/CARTILHA DE USO DE BATERIA.pdf');
     }
 
     try {
