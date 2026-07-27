@@ -208,16 +208,19 @@
   <div class="form-group"><label>Modelo do Guia</label>
     <select id="in_modelo">
       <option value="BIKE POP">BIKE POP</option>
+      <option value="BIG TRI">BIG TRI</option>
       <option value="JET MAX">JET MAX</option>
       <option value="JET">JET</option>
       <option value="JOY SUPER">JOY SUPER</option>
       <option value="MC20">MC20</option>
       <option value="MIA">MIA</option>
+      <option value="MIA TRI">MIA TRI</option>
       <option value="PITICA">PITICA</option>
       <option value="RET">RET</option>
       <option value="SOMA">SOMA</option>
       <option value="X11">X11</option>
       <option value="X12">X12</option>
+      <option value="X15">X15</option>
     </select>
   </div>
   <div class="form-group"><label>Potência</label>
@@ -272,17 +275,22 @@
       Motor: document.getElementById('in_motor').value.toUpperCase()
     };
 
-    // Documentos padrão (Termo de Responsabilidade duplicado para gerar 2 vias)
+    // Documentos padrão (Certificado + 2 vias do Termo de Responsabilidade)
     const arquivos = [
       'documentos/CERTIFICADO DE GARANTIA.pdf',
       'documentos/TERMO DE RESPONSABILIDADE AUTOPROPELIDO.pdf',
       'documentos/TERMO DE RESPONSABILIDADE AUTOPROPELIDO.pdf'
     ];
 
-    // Guia Cuide Bem do modelo específico
-    arquivos.push(`documentos/GUIA CUIDE BEM ${modeloSelecionado}.pdf`);
+    // Lista de modelos que NÃO possuem o Guia "Cuide Bem"
+    const modelosSemGuia = ["BIG TRI", "MIA TRI", "X15"];
 
-// Lógica das Cartilhas de Bateria (2 cópias para cada situação)
+    // Adiciona o Guia Cuide Bem apenas se o modelo selecionado não estiver na lista acima
+    if (!modelosSemGuia.includes(modeloSelecionado)) {
+      arquivos.push(`documentos/GUIA CUIDE BEM ${modeloSelecionado}.pdf`);
+    }
+
+    // Lógica das Cartilhas de Bateria (2 cópias para cada situação)
     if (isMaringa) {
       arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
       arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
