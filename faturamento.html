@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MOTO CHEFE - Sistema de Faturamento e Pedidos</title>
+    
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --surface-dark: #1e1e1e;
+            --primary-red: #d32f2f;
+            --primary-red-hover: #b71c1c;
+            --text-main: #ffffff;
+            --text-muted: #b0b0b0;
+            --border-color: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 10px auto;
+            background: var(--surface-dark);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .header img {
+            max-width: 140px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            color: var(--text-main);
+            font-size: 18px;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            padding: 12px;
+            background-color: #2a2a2a;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 6px;
+            font-size: 16px;
+            text-transform: uppercase;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-red);
+            outline: none;
+            box-shadow: 0 0 5px rgba(211, 47, 47, 0.4);
+        }
+
+        .payment-box {
+            background: #252525;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 5px;
+        }
+
+        .payment-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .extra-fields {
+            margin-top: 10px;
+            display: none;
+            gap: 10px;
+        }
+
+        .extra-fields.active {
+            display: flex;
+        }
+
+        .btn-add-extra {
+            background: transparent;
+            border: 1px dashed var(--primary-red);
+            color: var(--text-main);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 6px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .btn-add-extra:hover {
+            background: rgba(211, 47, 47, 0.1);
+        }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: #252525;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary-red);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-item input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-red);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .checkbox-item label {
+            color: var(--text-main);
+            margin-bottom: 0;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        h3 {
+            color: var(--text-main);
+            font-size: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+            margin-top: 15px;
+        }
+        
+        button.btn-acao {
+            grid-column: 1 / -1;
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        button.btn-acao:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        #preview-box {
+            background: #1a1a1a;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 13px;
+            color: #e0e0e0;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 5px; }
+            .container { padding: 15px; margin: 5px; }
+            .form-grid, .checkbox-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <img src="LOGO MC - BRANCA .png" alt="Moto Chefe Logo">
+            <h1>Sistema de Faturamento de Vendas</h1>
+            <p>Preencha as informações para gerar o modelo padronizado para o WhatsApp</p>
+        </div>
+
+        <form id="form-faturamento" class="form-grid">
+            
+            <!-- Vendedor / Loja -->
+            <div class="form-group"><label>Vendedor (Seu Nome)</label><input type="text" id="in_vendedor" required placeholder="Ex: Matheus"></div>
+            <div class="form-group"><label>Loja / Responsável</label><input type="text" id="in_loja" value="Matheus Oliveira | Moto Chefe"></div>
+
+            <!-- Dados do Cliente -->
+            <div class="form-group full-width"><h3>Dados do Cliente</h3></div>
+            <div class="form-group full-width"><label>Nome Completo</label><input type="text" id="in_nome" required></div>
+            <div class="form-group"><label>CPF</label><input type="text" id="in_cpf" required></div>
+            <div class="form-group"><label>RG</label><input type="text" id="in_rg"></div>
+            <div class="form-group"><label>Data de Nascimento</label><input type="text" id="in_nascimento" placeholder="DD/MM/AAAA"></div>
+            <div class="form-group"><label>Telefone</label><input type="text" id="in_telefone" placeholder="(44) 99999-9999"></div>
+            <div class="form-group"><label>E-mail</label><input type="text" id="in_email" style="text-transform: lowercase;"></div>
+            <div class="form-group full-width"><label>Endereço com nº</label><input type="text" id="in_endereco"></div>
+            <div class="form-group"><label>Bairro</label><input type="text" id="in_bairro"></div>
+            <div class="form-group"><label>Cidade</label><input type="text" id="in_cidade"></div>
+            <div class="form-group"><label>Estado (UF)</label><input type="text" id="in_estado" maxlength="2" value="PR"></div>
+            <div class="form-group"><label>CEP</label><input type="text" id="in_cep"></div>
+
+            <!-- Dados do Veículo -->
+            <div class="form-group full-width"><h3>Dados do Veículo e Nota</h3></div>
+            <div class="form-group"><label>Modelo do Veículo</label><input type="text" id="in_modelo" required placeholder="Ex: x12"></div>
+            <div class="form-group"><label>Cor</label><input type="text" id="in_cor"></div>
+            <div class="form-group"><label>Chassi</label><input type="text" id="in_chassi" required></div>
+            <div class="form-group"><label>Motor</label><input type="text" id="in_motor" required></div>
+            <div class="form-group"><label>Valor da Nota (R$)</label><input type="text" id="in_valor_nota" placeholder="10.990,00"></div>
+
+            <!-- Formas de Pagamento -->
+            <div class="form-group full-width"><h3>Formas de Pagamento</h3></div>
+            
+            <!-- PIX -->
+            <div class="form-group full-width payment-box">
+                <label>Pix (R$)</label>
+                <div class="payment-row">
+                    <input type="text" id="in_pix_valor" placeholder="Ex: 500,00 entrada ou 7500,00">
+                </div>
+                <button type="button" class="btn-add-extra" onclick="toggleExtra('pix')">+ Adicionar acréscimo (ex: frete)</button>
+                <div id="extra_pix" class="extra-fields">
+                    <input type="text" id="in_pix_extra_val" placeholder="Valor Adicional (Ex: 250,00)">
+                    <input type="text" id="in_pix_extra_desc" placeholder="Descrição (Ex: referente ao frete)">
+                </div>
+            </div>
+
+            <!-- CARTÃO -->
+            <div class="form-group full-width payment-box">
+                <label>Cartão</label>
+                <div class="payment-row">
+                    <input type="text" id="in_cartao_valor" placeholder="Valor (Ex: 11.000,00 18x)">
+                </div>
+                <button type="button" class="btn-add-extra" onclick="toggleExtra('cartao')">+ Adicionar acréscimo (ex: frete/acessório)</button>
+                <div id="extra_cartao" class="extra-fields">
+                    <input type="text" id="in_cartao_extra_val" placeholder="Valor Adicional (Ex: 649,90)">
+                    <input type="text" id="in_cartao_extra_desc" placeholder="Descrição (Ex: cadeirinha)">
+                </div>
+            </div>
+
+            <!-- DINHEIRO -->
+            <div class="form-group full-width payment-box">
+                <label>Dinheiro (R$)</label>
+                <div class="payment-row">
+                    <input type="text" id="in_dinheiro_valor" placeholder="Ex: 0,00">
+                </div>
+                <button type="button" class="btn-add-extra" onclick="toggleExtra('dinheiro')">+ Adicionar acréscimo (ex: frete)</button>
+                <div id="extra_dinheiro" class="extra-fields">
+                    <input type="text" id="in_dinheiro_extra_val" placeholder="Valor Adicional">
+                    <input type="text" id="in_dinheiro_extra_desc" placeholder="Descrição">
+                </div>
+            </div>
+
+            <div class="form-group full-width"><label>Resumo / Descrição de Pagamento Geral</label><input type="text" id="in_forma_pgto_geral" placeholder="Ex: cartão de credito 18x"></div>
+
+            <!-- Logística / Frete -->
+            <div class="form-group full-width"><h3>Logística e Entrega</h3></div>
+            <div class="form-group full-width">
+                <label>Tipo de Frete / Retirada</label>
+                <select id="in_tipo_frete">
+                    <option value="cliente vai levar">Cliente vai levar</option>
+                    <option value="Frete Parceiro">Frete Parceiro</option>
+                    <option value="Frete Transportadora">Frete Transportadora</option>
+                </select>
+            </div>
+
+            <!-- Checkboxes (Bonificação, Brindes, etc) -->
+            <div class="form-group full-width"><h3>Benefícios e Adicionais</h3></div>
+            <div class="form-group full-width checkbox-grid">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="chk_bonif" onchange="toggleBonif()">
+                    <label for="chk_bonif">Bonificação de frete</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="chk_brinde" checked>
+                    <label for="chk_brinde">Brinde</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="chk_garantia" checked>
+                    <label for="chk_garantia">Certificado de garantia</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="chk_revisao" checked>
+                    <label for="chk_revisao">1ª Revisão</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="chk_cuide" checked>
+                    <label for="chk_cuide">Guia Cuide bem</label>
+                </div>
+            </div>
+
+            <!-- Campo Condicional de Bonificação de Frete -->
+            <div class="form-group full-width" id="box_bonif_valor" style="display: none; margin-top: 10px;">
+                <label>Valor Bonificado do Frete (R$)</label>
+                <input type="text" id="in_bonif_valor" placeholder="Ex: 250,00">
+            </div>
+
+            <!-- Bloco de Acessório Extra (Opcional baseado no seu print) -->
+            <div class="form-group full-width"><h3>Detalhes de Acessório (Se houver)</h3></div>
+            <div class="form-group"><label>Nome do Acessório</label><input type="text" id="in_acessorio" placeholder="Ex: Cadeirinha"></div>
+            <div class="form-group"><label>Valor do Acessório (R$)</label><input type="text" id="in_val_acessorio" placeholder="Ex: 649,90"></div>
+
+            <button type="button" class="btn-acao" onclick="gerarTexto()">Gerar Texto para WhatsApp</button>
+
+            <!-- Pré-visualização e Botão Copiar -->
+            <div class="form-group full-width">
+                <h3>Texto Pronto para Copiar</h3>
+                <div id="preview-box">Preencha os dados acima e clique em "Gerar Texto"...</div>
+                <button type="button" class="btn-acao" style="background-color: #2e7d32;" onclick="copiarTexto()">Copiar Texto para o WhatsApp</button>
+            </div>
+
+        </form>
+    </div>
+
+<script>
+    function toggleExtra(tipo) {
+        const el = document.getElementById(`extra_${tipo}`);
+        el.classList.toggle('active');
+    }
+
+    function toggleBonif() {
+        const chk = document.getElementById('chk_bonif').checked;
+        const box = document.getElementById('box_bonif_valor');
+        box.style.display = chk ? 'flex' : 'none';
+    }
+
+    function formatarPagamento(campoValor, campoExtraVal, campoExtraDesc) {
+        let val = document.getElementById(campoValor).value.trim();
+        let extraVal = document.getElementById(campoExtraVal).value.trim();
+        let extraDesc = document.getElementById(campoExtraDesc).value.trim();
+
+        if (!val) return "";
+        let texto = `R$ ${val}`;
+        if (extraVal) {
+            let desc = extraDesc ? `referente ao ${extraDesc}` : "adicional";
+            texto += ` + R$ ${extraVal} ${desc}`;
+        }
+        return texto;
+    }
+
+    function gerarTexto() {
+        const vendedor = document.getElementById('in_vendedor').value.toUpperCase();
+        const loja = document.getElementById('in_loja').value;
+        const nome = document.getElementById('in_nome').value.toUpperCase();
+        const cpf = document.getElementById('in_cpf').value;
+        const rg = document.getElementById('in_rg').value;
+        const nascimento = document.getElementById('in_nascimento').value;
+        const telefone = document.getElementById('in_telefone').value;
+        const cidade = document.getElementById('in_cidade').value.toUpperCase();
+        const endereco = document.getElementById('in_endereco').value.toUpperCase();
+        const bairro = document.getElementById('in_bairro').value.toUpperCase();
+        const estado = document.getElementById('in_estado').value.toUpperCase();
+        const cep = document.getElementById('in_cep').value;
+        const email = document.getElementById('in_email').value;
+        const modelo = document.getElementById('in_modelo').value.toUpperCase();
+        const cor = document.getElementById('in_cor').value.toUpperCase();
+        const chassi = document.getElementById('in_chassi').value.toUpperCase();
+        const motor = document.getElementById('in_motor').value.toUpperCase();
+        const valorNota = document.getElementById('in_valor_nota').value;
+        const formaPgtoGeral = document.getElementById('in_forma_pgto_geral').value.toLowerCase();
+        
+        const cartaoStr = formatarPagamento('in_cartao_valor', 'in_cartao_extra_val', 'in_cartao_extra_desc');
+        const pixStr = formatarPagamento('in_pix_valor', 'in_pix_extra_val', 'in_pix_extra_desc');
+        const dinheiroStr = formatarPagamento('in_dinheiro_valor', 'in_dinheiro_extra_val', 'in_dinheiro_extra_desc');
+
+        const tipoFrete = document.getElementById('in_tipo_frete').value;
+        
+        // Fretes checkboxes
+        let freteParceiro = tipoFrete === "Frete Parceiro" ? "( x )" : "(   )";
+        let freteTransp = tipoFrete === "Frete Transportadora" ? "( x )" : "(   )";
+        let clienteLevar = tipoFrete === "cliente vai levar" ? "( x )" : "(   )";
+
+        // Bonificação
+        const chkBonif = document.getElementById('chk_bonif').checked;
+        const valBonif = document.getElementById('in_bonif_valor').value.trim();
+        let bonifTexto = chkBonif ? (valBonif ? `Sim, ${valBonif} bonificado referente ao frete` : "sim") : "não";
+
+        // Demais checks
+        const brinde = document.getElementById('chk_brinde').checked ? "sim" : "não";
+        const garantia = document.getElementById('chk_garantia').checked ? "sim" : "não";
+        const revisao = document.getElementById('chk_revisao').checked ? "sim" : "não";
+        const cuide = document.getElementById('chk_cuide').checked ? "sim" : "não";
+
+        // Acessório extra
+        const acessorio = document.getElementById('in_acessorio').value;
+        const valAcessorio = document.getElementById('in_val_acessorio').value;
+
+        // Montagem do modelo estruturado
+        let textoFinal = `${loja}
+Nome completo: ${nome}
+CPF : ${cpf}
+RG: ${rg}
+data de nascimento: ${nascimento}
+telefone : ${telefone}
+cidade: ${cidade}
+endereço com nº: ${endereco}
+Bairro: ${bairro}
+estado: ${estado}
+CEP : ${cep}
+email : ${email}
+Modelo: ${modelo}
+Cor: ${cor}
+Chassi: ${chassi}
+Motor: ${motor}
+Valor de nota: R$ ${valorNota}
+Forma de pagamento: ${formaPgtoGeral}
+Dinheiro: ${dinheiroStr}
+Cartão: ${cartaoStr}
+Pix: ${pixStr}
+Frete Parceiro ${freteParceiro} Frete Transportadora ${freteTransp} cliente vai levar ${clienteLevar}
+Bonificação de frete: ${bonifTexto}
+Brinde: ${brinde}
+Certificado de garantia: ${garantia}
+1ªRevisão: ${revisao}
+Cuide bem: ${cuide}
+Vendedor: ${vendedor}`;
+
+        if (acessorio) {
+            textoFinal += `\n\nNome: ${nome.split(' ')[0]}
+acessorio: ${acessorio}
+cor: 
+tamanho: 
+valor: R$ ${valAcessorio}
+forma de pagamento: ${formaPgtoGeral}
+vendedor: ${vendedor}`;
+        }
+
+        document.getElementById('preview-box').textContent = textoFinal;
+    }
+
+    function copiarTexto() {
+        const texto = document.getElementById('preview-box').textContent;
+        if (!texto || texto.startsWith('Preencha')) {
+            alert('Por favor, clique em "Gerar Texto para WhatsApp" primeiro.');
+            return;
+        }
+        navigator.clipboard.writeText(texto).then(() => {
+            alert('Texto copiado com sucesso para a área de transferência! Cole no WhatsApp.');
+        }).catch(err => {
+            alert('Erro ao copiar texto.');
+        });
+    }
+</script>
+</body>
+</html>
