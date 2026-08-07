@@ -236,22 +236,23 @@
         <form id="form-faturamento" class="form-grid">
             
             <!-- Vendedor / Loja -->
-            <div class="form-group"><label>Vendedor (Seu Nome)</label><input type="text" id="in_vendedor" required placeholder="Ex: Alan"></div>
-            <div class="form-group"><label>Loja / Responsável</label><input type="text" id="in_loja" value="Moto Chefe Maringa"></div>
+            <div class="form-group"><label>Vendedor (Seu Nome)</label><input type="text" id="in_vendedor" required placeholder="Ex: Matheus"></div>
+            <div class="form-group"><label>Loja / Responsável</label><input type="text" id="in_loja" value="Matheus Oliveira | Moto Chefe"></div>
 
             <!-- Dados do Cliente -->
             <div class="form-group full-width"><h3>Dados do Cliente</h3></div>
+            <div class="form-group"><label>CEP (Preenche automático)</label><input type="text" id="in_cep" placeholder="00000-000" maxlength="9" onblur="consultarCep()"></div>
+            <div class="form-group"><label>Estado (UF)</label><input type="text" id="in_estado" maxlength="2"></div>
+            <div class="form-group"><label>Cidade</label><input type="text" id="in_cidade"></div>
+            <div class="form-group"><label>Bairro</label><input type="text" id="in_bairro"></div>
+            <div class="form-group full-width"><label>Endereço (Rua e Nº)</label><input type="text" id="in_endereco" placeholder="Digite a rua e o número"></div>
+            
             <div class="form-group full-width"><label>Nome Completo</label><input type="text" id="in_nome" required></div>
             <div class="form-group"><label>CPF</label><input type="text" id="in_cpf" required></div>
             <div class="form-group"><label>RG</label><input type="text" id="in_rg"></div>
             <div class="form-group"><label>Data de Nascimento</label><input type="text" id="in_nascimento" placeholder="DD/MM/AAAA"></div>
             <div class="form-group"><label>Telefone</label><input type="text" id="in_telefone" placeholder="(44) 99999-9999"></div>
             <div class="form-group"><label>E-mail</label><input type="text" id="in_email" style="text-transform: lowercase;"></div>
-            <div class="form-group full-width"><label>Endereço com nº</label><input type="text" id="in_endereco"></div>
-            <div class="form-group"><label>Bairro</label><input type="text" id="in_bairro"></div>
-            <div class="form-group"><label>Cidade</label><input type="text" id="in_cidade"></div>
-            <div class="form-group"><label>Estado (UF)</label><input type="text" id="in_estado" maxlength="2" value="PR"></div>
-            <div class="form-group"><label>CEP</label><input type="text" id="in_cep"></div>
 
             <!-- Dados do Veículo -->
             <div class="form-group full-width"><h3>Dados do Veículo e Nota</h3></div>
@@ -347,7 +348,7 @@
                 <input type="text" id="in_bonif_valor" placeholder="Ex: 250,00">
             </div>
 
-            <!-- Bloco de Acessório Extra (Opcional baseado no seu print) -->
+            <!-- Bloco de Acessório Extra -->
             <div class="form-group full-width"><h3>Detalhes de Acessório (Se houver)</h3></div>
             <div class="form-group"><label>Nome do Acessório</label><input type="text" id="in_acessorio" placeholder="Ex: Cadeirinha"></div>
             <div class="form-group"><label>Valor do Acessório (R$)</label><input type="text" id="in_val_acessorio" placeholder="Ex: 649,90"></div>
@@ -365,6 +366,32 @@
     </div>
 
 <script>
+    // Função para puxar o endereço automático pelo CEP
+    async function consultarCep() {
+        let cep = document.getElementById('in_cep').value.replace(/\D/g, '');
+        if (cep.length !== 8) return;
+
+        try {
+            let resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            let dados = await resposta.json();
+
+            if (!dados.erro) {
+                document.getElementById('in_estado').value = dados.uf || '';
+                document.getElementById('in_cidade').value = dados.localidade || '';
+                document.getElementById('in_bairro').value = dados.bairro || '';
+                
+                // Se a API retornar a rua, já deixa preenchido e foca no final para digitar o número
+                let ruaCompleta = dados.logradouro ? `${dados.logradouro}, ` : '';
+                document.getElementById('in_endereco').value = ruaCompleta;
+                document.getElementById('in_endereco').focus();
+            } else {
+                alert('CEP não encontrado.');
+            }
+        } catch (erro) {
+            console.error('Erro ao buscar CEP:', erro);
+        }
+    }
+
     function toggleExtra(tipo) {
         const el = document.getElementById(`extra_${tipo}`);
         el.classList.toggle('active');
@@ -417,27 +444,22 @@
 
         const tipoFrete = document.getElementById('in_tipo_frete').value;
         
-        // Fretes checkboxes
         let freteParceiro = tipoFrete === "Frete Parceiro" ? "( x )" : "(   )";
         let freteTransp = tipoFrete === "Frete Transportadora" ? "( x )" : "(   )";
         let clienteLevar = tipoFrete === "cliente vai levar" ? "( x )" : "(   )";
 
-        // Bonificação
         const chkBonif = document.getElementById('chk_bonif').checked;
         const valBonif = document.getElementById('in_bonif_valor').value.trim();
         let bonifTexto = chkBonif ? (valBonif ? `Sim, ${valBonif} bonificado referente ao frete` : "sim") : "não";
 
-        // Demais checks
         const brinde = document.getElementById('chk_brinde').checked ? "sim" : "não";
         const garantia = document.getElementById('chk_garantia').checked ? "sim" : "não";
         const revisao = document.getElementById('chk_revisao').checked ? "sim" : "não";
         const cuide = document.getElementById('chk_cuide').checked ? "sim" : "não";
 
-        // Acessório extra
         const acessorio = document.getElementById('in_acessorio').value;
         const valAcessorio = document.getElementById('in_val_acessorio').value;
 
-        // Montagem do modelo estruturado
         let textoFinal = `${loja}
 Nome completo: ${nome}
 CPF : ${cpf}
