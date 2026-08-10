@@ -25,7 +25,7 @@
         }
 
         .container {
-            max-width: 1100px; /* Aumentado levemente para acomodar o painel lateral */
+            max-width: 1100px;
             margin: 10px auto;
             background: var(--surface-dark);
             padding: 20px;
@@ -61,7 +61,6 @@
             margin-top: 5px;
         }
 
-        /* Layout em Grid Principal com a Calculadora Lateral */
         .layout-main {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -160,6 +159,39 @@
         .btn-add-extra:hover {
             background: rgba(211, 47, 47, 0.1);
         }
+
+        /* Estilos para Múltiplos Cartões */
+        .cartao-item {
+            background: #202020;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 8px;
+            align-items: end;
+        }
+
+        @media (max-width: 600px) {
+            .cartao-item {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn-remover-cartao {
+            background-color: #b71c1c;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-remover-cartao:hover {
+            background-color: #d32f2f;
+        }
         
         .checkbox-grid {
             display: grid;
@@ -200,7 +232,16 @@
             margin-top: 15px;
         }
 
-        /* Estilo da Calculadora Lateral */
+        /* Acessório Bloco */
+        .acessorio-bloco {
+            background: #252525;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        /* Calculadora Lateral */
         .calculator-sidebar {
             background: #181818;
             border: 1px solid var(--border-color);
@@ -319,7 +360,7 @@
                     
                     <!-- Vendedor / Loja -->
                     <div class="form-group"><label>Vendedor (Seu Nome)</label><input type="text" id="in_vendedor" required placeholder="Ex: Alan"></div>
-                    <div class="form-group"><label>Loja / Responsável</label><input type="text" id="in_loja" value="MOTO CHEFE MARINGA"></div>
+                    <div class="form-group"><label>Loja / Responsável</label><input type="text" id="in_loja" value=""></div>
 
                     <!-- Dados do Cliente -->
                     <div class="form-group full-width"><h3>Dados do Cliente</h3></div>
@@ -360,17 +401,13 @@
                         </div>
                     </div>
 
-                    <!-- CARTÃO -->
+                    <!-- CARTÕES DINÂMICOS -->
                     <div class="form-group full-width payment-box">
-                        <label>Cartão</label>
-                        <div class="payment-row">
-                            <input type="text" id="in_cartao_valor" placeholder="Valor (Ex: 11.000,00 18x)" oninput="atualizarCalculadora()">
+                        <label>Cartões (Crédito / Débito)</label>
+                        <div id="lista-cartoes">
+                            <!-- Os cartões adicionados entram aqui -->
                         </div>
-                        <button type="button" class="btn-add-extra" onclick="toggleExtra('cartao')">+ Adicionar acréscimo (ex: frete/acessório)</button>
-                        <div id="extra_cartao" class="extra-fields">
-                            <input type="text" id="in_cartao_extra_val" placeholder="Valor Adicional (Ex: 649,90)" oninput="atualizarCalculadora()">
-                            <input type="text" id="in_cartao_extra_desc" placeholder="Descrição (Ex: cadeirinha)">
-                        </div>
+                        <button type="button" class="btn-add-extra" onclick="adicionarCartao()">+ Adicionar Cartão</button>
                     </div>
 
                     <!-- DINHEIRO -->
@@ -430,10 +467,14 @@
                         <input type="text" id="in_bonif_valor" placeholder="Ex: 250,00">
                     </div>
 
-                    <!-- Bloco de Acessório Extra -->
-                    <div class="form-group full-width"><h3>Detalhes de Acessório (Se houver)</h3></div>
-                    <div class="form-group"><label>Nome do Acessório</label><input type="text" id="in_acessorio" placeholder="Ex: Cadeirinha"></div>
-                    <div class="form-group"><label>Valor do Acessório (R$)</label><input type="text" id="in_val_acessorio" placeholder="Ex: 649,90" oninput="atualizarCalculadora()"></div>
+                    <!-- Bloco de Acessórios Múltiplos -->
+                    <div class="form-group full-width">
+                        <h3>Acessórios (Se houver)</h3>
+                        <div id="lista-acessorios">
+                            <!-- Inseridos dinamicamente -->
+                        </div>
+                        <button type="button" class="btn-add-extra" onclick="adicionarAcessorio()">+ Adicionar Acessório</button>
+                    </div>
                     
                     <!-- Bloco de Observações -->
                     <div class="form-group full-width"><h3>Observações Adicionais</h3></div>
@@ -489,10 +530,62 @@
     </div>
 
 <script>
-    // Função para converter string monetária BR (ex: "10.990,00" ou "500") para número JS
+    // Gerenciador de Múltiplos Cartões
+    function adicionarCartao() {
+        const container = document.getElementById('lista-cartoes');
+        const div = document.createElement('div');
+        div.className = 'cartao-item';
+        div.innerHTML = `
+            <div class="form-group" style="margin:0;"><label>Valor (R$)</label><input type="text" class="cartao-val" placeholder="Ex: 5000,00" oninput="atualizarCalculadora()"></div>
+            <div class="form-group" style="margin:0;"><label>Tipo</label><select class="cartao-tipo" onchange="alternarParcelas(this)"><option value="CRÉDITO">Crédito</option><option value="DÉBITO">Débito</option></select></div>
+            <div class="form-group cartao-parcelas-box" style="margin:0;"><label>Parcelas</label><input type="text" class="cartao-parc" placeholder="Ex: 12x"></div>
+            <button type="button" class="btn-remover-cartao" onclick="removerCartao(this)">X</button>
+        `;
+        container.appendChild(div);
+        atualizarCalculadora();
+    }
+
+    function removerCartao(btn) {
+        btn.closest('.cartao-item').remove();
+        atualizarCalculadora();
+    }
+
+    function alternarParcelas(select) {
+        const item = select.closest('.cartao-item');
+        const boxParc = item.querySelector('.cartao-parcelas-box');
+        if (select.value === 'DÉBITO') {
+            boxParc.style.display = 'none';
+        } else {
+            boxParc.style.display = 'flex';
+        }
+        atualizarCalculadora();
+    }
+
+    // Gerenciador de Múltiplos Acessórios
+    function adicionarAcessorio() {
+        const container = document.getElementById('lista-acessorios');
+        const div = document.createElement('div');
+        div.className = 'acessorio-bloco';
+        div.innerHTML = `
+            <div class="form-grid">
+                <div class="form-group"><label>Nome do Acessório</label><input type="text" class="ac_nome" placeholder="Ex: Cadeirinha"></div>
+                <div class="form-group"><label>Cor</label><input type="text" class="ac_cor" placeholder="Ex: Preto"></div>
+                <div class="form-group"><label>Tamanho</label><input type="text" class="ac_tam" placeholder="Ex: Único"></div>
+                <div class="form-group"><label>Valor (R$)</label><input type="text" class="ac_val" placeholder="Ex: 649,90" oninput="atualizarCalculadora()"></div>
+                <div class="form-group full-width"><label>Forma de Pagamento</label><input type="text" class="ac_pgto" placeholder="Ex: parcelado em 18x"></div>
+            </div>
+            <button type="button" class="btn-remover-cartao" style="margin-top:8px; width:100%; padding:8px;" onclick="removerAcessorio(this)">Remover Acessório</button>
+        `;
+        container.appendChild(div);
+    }
+
+    function removerAcessorio(btn) {
+        btn.closest('.acessorio-bloco').remove();
+        atualizarCalculadora();
+    }
+
     function converterMoeda(valorStr) {
         if (!valorStr) return 0;
-        // Remove "R$", espaços, e trata pontos de milhar e vírgula decimal
         let limpo = valorStr.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
         let numero = parseFloat(limpo);
         return isNaN(numero) ? 0 : numero;
@@ -504,25 +597,32 @@
 
     function atualizarCalculadora() {
         let nota = converterMoeda(document.getElementById('in_valor_nota').value);
-        let acessorioVal = converterMoeda(document.getElementById('in_val_acessorio').value);
-        let totalEsperado = nota + acessorioVal;
+        
+        let totalAcessorios = 0;
+        document.querySelectorAll('.ac_val').forEach(input => {
+            totalAcessorios += converterMoeda(input.value);
+        });
 
-        // Soma dos pagamentos principais e adicionais
+        let totalEsperado = nota + totalAcessorios;
+
+        // Soma Pix e Dinheiro
         let pix = converterMoeda(document.getElementById('in_pix_valor').value);
         let pixExtra = converterMoeda(document.getElementById('in_pix_extra_val').value);
-        
-        let cartao = converterMoeda(document.getElementById('in_cartao_valor').value);
-        let cartaoExtra = converterMoeda(document.getElementById('in_cartao_extra_val').value);
-        
         let dinheiro = converterMoeda(document.getElementById('in_dinheiro_valor').value);
         let dinheiroExtra = converterMoeda(document.getElementById('in_dinheiro_extra_val').value);
 
-        let totalInformado = pix + pixExtra + cartao + cartaoExtra + dinheiro + dinheiroExtra;
+        // Soma Cartões dinâmicos
+        let totalCartoes = 0;
+        document.querySelectorAll('.cartao-item').forEach(item => {
+            let val = converterMoeda(item.querySelector('.cartao-val').value);
+            totalCartoes += val;
+        });
+
+        let totalInformado = pix + pixExtra + dinheiro + dinheiroExtra + totalCartoes;
         let diferenca = totalEsperado - totalInformado;
 
-        // Atualiza labels visuais
         document.getElementById('lbl_nota').textContent = formatarMoeda(nota);
-        document.getElementById('lbl_acessorio').textContent = formatarMoeda(acessorioVal);
+        document.getElementById('lbl_acessorio').textContent = formatarMoeda(totalAcessorios);
         document.getElementById('lbl_total_geral').textContent = formatarMoeda(totalEsperado);
         document.getElementById('lbl_informado').textContent = formatarMoeda(totalInformado);
 
@@ -620,12 +720,30 @@
         const valorNota = document.getElementById('in_valor_nota').value;
         const formaPgtoGeral = document.getElementById('in_forma_pgto_geral').value.toLowerCase();
         
-        const cartaoStr = formatarPagamento('in_cartao_valor', 'in_cartao_extra_val', 'in_cartao_extra_desc');
         const pixStr = formatarPagamento('in_pix_valor', 'in_pix_extra_val', 'in_pix_extra_desc');
         const dinheiroStr = formatarPagamento('in_dinheiro_valor', 'in_dinheiro_extra_val', 'in_dinheiro_extra_desc');
 
+        // Montagem do formato de cartões dinâmicos solicitados
+        let cartoesArray = [];
+        document.querySelectorAll('.cartao-item').forEach(item => {
+            let val = item.querySelector('.cartao-val').value.trim();
+            let tipo = item.querySelector('.cartao-tipo').value;
+            let parcInput = item.querySelector('.cartao-parc').value.trim();
+
+            if (val) {
+                let numVal = converterMoeda(val);
+                if (tipo === 'DÉBITO') {
+                    cartoesArray.push(`${val} DÉBITO`);
+                } else {
+                    let numParc = parseInt(parcInput.replace(/\D/g, '')) || 1;
+                    let valorParcela = (numVal / numParc).toFixed(2).replace('.', ',');
+                    cartoesArray.push(`${val} | ${numParc}x de ${valorParcela}`);
+                }
+            }
+        });
+        const cartaoStr = cartoesArray.join(' | ');
+
         const tipoFrete = document.getElementById('in_tipo_frete').value;
-        
         let freteParceiro = tipoFrete === "Frete Parceiro" ? "( x )" : "(   )";
         let freteTransp = tipoFrete === "Frete Transportadora" ? "( x )" : "(   )";
         let clienteLevar = tipoFrete === "cliente vai levar" ? "( x )" : "(   )";
@@ -638,9 +756,6 @@
         const garantia = document.getElementById('chk_garantia').checked ? "sim" : "não";
         const revisao = document.getElementById('chk_revisao').checked ? "sim" : "não";
         const cuide = document.getElementById('chk_cuide').checked ? "sim" : "não";
-
-        const acessorio = document.getElementById('in_acessorio').value;
-        const valAcessorio = document.getElementById('in_val_acessorio').value;
         const observacao = document.getElementById('in_observacao').value.trim();
 
         let textoFinal = `${loja}
@@ -672,15 +787,24 @@ Certificado de garantia: ${garantia}
 Cuide bem: ${cuide}
 Vendedor: ${vendedor}`;
 
-        if (acessorio) {
-            textoFinal += `\n\nNome: ${nome.split(' ')[0]}
-acessorio: ${acessorio}
-cor: 
-tamanho: 
-valor: R$ ${valAcessorio}
-forma de pagamento: ${formaPgtoGeral}
+        // Adiciona múltiplos acessórios se houver
+        document.querySelectorAll('.acessorio-bloco').forEach(bloco => {
+            let acNome = bloco.querySelector('.ac_nome').value.toUpperCase();
+            let acCor = bloco.querySelector('.ac_cor').value.toUpperCase();
+            let acTam = bloco.querySelector('.ac_tam').value.toUpperCase();
+            let acVal = bloco.querySelector('.ac_val').value.trim();
+            let acPgto = bloco.querySelector('.ac_pgto').value.toLowerCase();
+
+            if (acNome) {
+                textoFinal += `\n\nNome: ${nome.split(' ')[0]}
+acessorio: ${acNome}
+cor: ${acCor}
+tamanho: ${acTam}
+valor: R$ ${acVal}
+forma de pagamento: ${acPgto}
 vendedor: ${vendedor}`;
-        }
+            }
+        });
 
         if (observacao) {
             textoFinal += `\n\nObservação: ${observacao}`;
