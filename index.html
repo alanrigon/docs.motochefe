@@ -24,7 +24,7 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             margin: 0;
-            padding: 10px; /* Reduzido para aproveitar melhor telas pequenas */
+            padding: 10px;
         }
 
         .container {
@@ -94,7 +94,7 @@
             border: 1px solid var(--border-color);
             color: var(--text-main);
             border-radius: 6px;
-            font-size: 16px; /* 16px previne zoom automático indesejado no iOS */
+            font-size: 16px;
             text-transform: uppercase;
             width: 100%;
             box-sizing: border-box;
@@ -174,7 +174,6 @@
             font-size: 14px;
         }
 
-        /* MEDIA QUERY PARA DISPOSITIVOS MÓVEIS (Telas menores que 768px) */
         @media (max-width: 768px) {
             body {
                 padding: 5px;
@@ -187,7 +186,7 @@
             }
 
             .form-grid {
-                grid-template-columns: 1fr; /* Transforma todas as linhas em coluna única no celular */
+                grid-template-columns: 1fr;
                 gap: 10px;
             }
 
@@ -205,7 +204,6 @@
 
     <div class="container">
         <div class="header">
-            <!-- Logotipo oficial da Moto Chefe -->
             <img src="LOGO MC - BRANCA .png" alt="Moto Chefe Logo">
             <h1>Gerador Automático de Documentos</h1>
             <p>Preencha os dados da venda para unificar e gerar os PDFs oficiais</p>
@@ -216,7 +214,11 @@
   <div class="form-group full-width"><label>Nome Completo (Razão Social)</label><input type="text" id="in_nome" required></div>
   <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="in_cpf" required></div>
   <div class="form-group"><label>RG / I.E.</label><input type="text" id="in_rg"></div>
-  <div class="form-group full-width"><label>Endereço com Número</label><input type="text" id="in_endereco"></div>
+  
+  <!-- Campo CEP posicionado antes do endereço para busca automática -->
+  <div class="form-group"><label>CEP</label><input type="text" id="in_cep" placeholder="00000-000" maxlength="9" onblur="consultarCep(this.value)"></div>
+  <div class="form-group"><label>Endereço com Número</label><input type="text" id="in_endereco"></div>
+  
   <div class="form-group"><label>Bairro</label><input type="text" id="in_bairro"></div>
   <div class="form-group"><label>Cidade</label><input type="text" id="in_cidade"></div>
   <div class="form-group"><label>Estado (UF)</label><input type="text" id="in_estado" maxlength="2"></div>
@@ -241,6 +243,7 @@
     <select id="in_modelo">
       <option value="BIKE POP">BIKE POP</option>
       <option value="BIG TRI">BIG TRI</option>
+      <option value="BOB">BOB</option>
       <option value="JET MAX">JET MAX</option>
       <option value="JET">JET</option>
       <option value="JOY SUPER">JOY SUPER</option>
@@ -273,6 +276,28 @@
 </form>
 
 <script>
+  // Função para preencher automaticamente os dados do endereço pelo ViaCEP
+  async function consultarCep(valor) {
+    const cepLimpo = valor.replace(/\D/g, '');
+    if (cepLimpo.length !== 8) return;
+
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        document.getElementById('in_endereco').value = data.logradouro ? data.logradouro.toUpperCase() : '';
+        document.getElementById('in_bairro').value = data.bairro ? data.bairro.toUpperCase() : '';
+        document.getElementById('in_cidade').value = data.localidade ? data.localidade.toUpperCase() : '';
+        document.getElementById('in_estado').value = data.uf ? data.uf.toUpperCase() : '';
+      } else {
+        alert("CEP não encontrado.");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar o CEP:", error);
+    }
+  }
+
   const { PDFDocument } = PDFLib;
 
   document.getElementById('form-documentos').addEventListener('submit', async function(e) {
@@ -307,22 +332,18 @@
       Motor: document.getElementById('in_motor').value.toUpperCase()
     };
 
-    // Documentos padrão (Certificado + 2 vias do Termo de Responsabilidade)
     const arquivos = [
       'documentos/CERTIFICADO DE GARANTIA.pdf',
       'documentos/TERMO DE RESPONSABILIDADE AUTOPROPELIDO.pdf',
       'documentos/TERMO DE RESPONSABILIDADE AUTOPROPELIDO.pdf'
     ];
 
-    // Lista de modelos que NÃO possuem o Guia "Cuide Bem"
-    const modelosSemGuia = ["BIG TRI", "MIA TRI", "X15"];
+    const modelosSemGuia = ["BIG TRI", "MIA TRI", "X15", "BOB"];
 
-    // Adiciona o Guia Cuide Bem apenas se o modelo selecionado não estiver na lista acima
     if (!modelosSemGuia.includes(modeloSelecionado)) {
       arquivos.push(`documentos/GUIA CUIDE BEM ${modeloSelecionado}.pdf`);
     }
 
-    // Lógica das Cartilhas de Bateria (2 cópias para cada situação)
     if (isMaringa) {
       arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
       arquivos.push('documentos/CARTILHA DE USO DE BATERIA MARINGA.pdf');
