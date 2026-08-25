@@ -244,6 +244,7 @@
       <option value="BIKE POP">BIKE POP</option>
       <option value="BIG TRI">BIG TRI</option>
       <option value="BOB">BOB</option>
+      <option value="GIGA">GIGA</option>
       <option value="JET MAX">JET MAX</option>
       <option value="JET">JET</option>
       <option value="JOY SUPER">JOY SUPER</option>
@@ -252,6 +253,7 @@
       <option value="MIA TRI">MIA TRI</option>
       <option value="PITICA">PITICA</option>
       <option value="RET">RET</option>
+      <option value="ROMA">ROMA</option>
       <option value="SOMA">SOMA</option>
       <option value="X11">X11</option>
       <option value="X12">X12</option>
@@ -338,7 +340,8 @@
       'documentos/TERMO DE RESPONSABILIDADE AUTOPROPELIDO.pdf'
     ];
 
-    const modelosSemGuia = ["BIG TRI", "MIA TRI", "X15", "BOB"];
+    // Modelos que NÃO possuem o Guia "Cuide Bem" (incluindo BOB e ROMA)
+    const modelosSemGuia = ["BIG TRI", "MIA TRI", "X15", "BOB", "ROMA"];
 
     if (!modelosSemGuia.includes(modeloSelecionado)) {
       arquivos.push(`documentos/GUIA CUIDE BEM ${modeloSelecionado}.pdf`);
