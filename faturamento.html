@@ -61,6 +61,48 @@
             margin-top: 5px;
         }
 
+        /* --- ABAS (TABS) --- */
+        .tab-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            background: #2a2a2a;
+            color: var(--text-muted);
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .tab-btn:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-red);
+            color: #fff;
+            border-color: var(--primary-red-hover);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- FORMS --- */
         .layout-main {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -109,6 +151,17 @@
             box-sizing: border-box;
         }
 
+        input[type="date"] {
+            text-transform: none;
+            color-scheme: dark;
+        }
+
+        input:disabled {
+            background-color: #1a1a1a;
+            color: #666;
+            cursor: not-allowed;
+        }
+
         textarea {
             resize: vertical;
             text-transform: none;
@@ -132,6 +185,13 @@
             display: flex;
             gap: 10px;
             align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            .payment-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
 
         .extra-fields {
@@ -160,7 +220,6 @@
             background: rgba(211, 47, 47, 0.1);
         }
 
-        /* Estilos para Múltiplos Cartões */
         .cartao-item {
             background: #202020;
             border: 1px solid var(--border-color);
@@ -224,6 +283,15 @@
             font-size: 13px;
         }
 
+        .checkbox-destaque {
+            background: rgba(211, 47, 47, 0.1);
+            border: 1px solid var(--primary-red);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+            display: inline-flex;
+        }
+
         h3 {
             color: var(--text-main);
             font-size: 15px;
@@ -232,7 +300,6 @@
             margin-top: 15px;
         }
 
-        /* Acessório Bloco */
         .acessorio-bloco {
             background: #252525;
             border: 1px solid var(--border-color);
@@ -241,7 +308,6 @@
             margin-bottom: 10px;
         }
 
-        /* Calculadora Lateral */
         .calculator-sidebar {
             background: #181818;
             border: 1px solid var(--border-color);
@@ -323,7 +389,7 @@
             background-color: var(--primary-red-hover);
         }
 
-        #preview-box {
+        .preview-box {
             background: #1a1a1a;
             border: 1px solid var(--border-color);
             padding: 15px;
@@ -353,184 +419,328 @@
             <p>Preencha as informações para gerar o modelo padronizado para o WhatsApp</p>
         </div>
 
-        <div class="layout-main">
-            <!-- Formulário -->
-            <form id="form-faturamento">
-                <div class="form-grid">
-                    
-                    <!-- Vendedor / Loja -->
-                    <div class="form-group"><label>Vendedor (Seu Nome)</label><input type="text" id="in_vendedor" required placeholder="Ex: Alan"></div>
-                    <div class="form-group"><label>Loja / Responsável</label><input type="text" id="in_loja" value=""></div>
+        <!-- Menu de Abas -->
+        <div class="tab-menu">
+            <div class="tab-btn active" id="btn-fat" onclick="switchTab('faturamento')">Faturamento (Venda Concluída)</div>
+            <div class="tab-btn" id="btn-sinal" onclick="switchTab('sinal')">Sinal (Reserva / Pedido)</div>
+        </div>
 
-                    <!-- Dados do Cliente -->
-                    <div class="form-group full-width"><h3>Dados do Cliente</h3></div>
-                    <div class="form-group"><label>CEP (Preenche automático)</label><input type="text" id="in_cep" placeholder="00000-000" maxlength="9" onblur="consultarCep()"></div>
-                    <div class="form-group"><label>Estado (UF)</label><input type="text" id="in_estado" maxlength="2"></div>
-                    <div class="form-group"><label>Cidade</label><input type="text" id="in_cidade"></div>
-                    <div class="form-group"><label>Bairro</label><input type="text" id="in_bairro"></div>
-                    <div class="form-group full-width"><label>Endereço (Rua e Nº)</label><input type="text" id="in_endereco" placeholder="Digite a rua e o número"></div>
-                    
-                    <div class="form-group full-width"><label>Nome Completo</label><input type="text" id="in_nome" required></div>
-                    <div class="form-group"><label>CPF</label><input type="text" id="in_cpf" required></div>
-                    <div class="form-group"><label>RG</label><input type="text" id="in_rg"></div>
-                    <div class="form-group"><label>Data de Nascimento</label><input type="text" id="in_nascimento" placeholder="DD/MM/AAAA"></div>
-                    <div class="form-group"><label>Telefone</label><input type="text" id="in_telefone" placeholder="(44) 99999-9999"></div>
-                    <div class="form-group"><label>E-mail</label><input type="text" id="in_email" style="text-transform: lowercase;"></div>
+        <!-- CONTEÚDO FATURAMENTO -->
+        <div id="tab-faturamento" class="tab-content active">
+            <div class="layout-main">
+                <form id="form-faturamento">
+                    <div class="form-grid">
+                        
+                        <!-- Vendedor -->
+                        <div class="form-group full-width"><label>Vendedor (Seu Nome)</label><input type="text" id="in_vendedor" required placeholder="Ex: Alan"></div>
 
-                    <!-- Dados do Veículo -->
-                    <div class="form-group full-width"><h3>Dados do Veículo e Nota</h3></div>
-                    <div class="form-group"><label>Modelo do Veículo</label><input type="text" id="in_modelo" required placeholder="Ex: x12"></div>
-                    <div class="form-group"><label>Cor</label><input type="text" id="in_cor"></div>
-                    <div class="form-group"><label>Chassi</label><input type="text" id="in_chassi" required></div>
-                    <div class="form-group"><label>Motor</label><input type="text" id="in_motor" required></div>
-                    <div class="form-group"><label>Valor da Nota (R$)</label><input type="text" id="in_valor_nota" placeholder="10.990,00" oninput="atualizarCalculadora()"></div>
+                        <!-- Dados do Cliente -->
+                        <div class="form-group full-width"><h3>Dados do Cliente</h3></div>
+                        <div class="form-group"><label>CEP</label><input type="text" id="in_cep" placeholder="00000-000" maxlength="9" onblur="consultarCep('fat')"></div>
+                        <div class="form-group"><label>Estado (UF)</label><input type="text" id="in_estado" maxlength="2"></div>
+                        <div class="form-group"><label>Cidade</label><input type="text" id="in_cidade"></div>
+                        <div class="form-group"><label>Bairro</label><input type="text" id="in_bairro"></div>
+                        <div class="form-group full-width"><label>Endereço (Rua e Nº)</label><input type="text" id="in_endereco" placeholder="Digite a rua e o número"></div>
+                        
+                        <div class="form-group full-width"><label>Nome Completo</label><input type="text" id="in_nome" required></div>
+                        <div class="form-group"><label>CPF</label><input type="text" id="in_cpf" required></div>
+                        <div class="form-group"><label>RG</label><input type="text" id="in_rg"></div>
+                        <div class="form-group"><label>Data de Nascimento</label><input type="text" id="in_nascimento" placeholder="DD/MM/AAAA"></div>
+                        <div class="form-group"><label>Telefone</label><input type="text" id="in_telefone" placeholder="(44) 99999-9999"></div>
+                        <div class="form-group"><label>E-mail</label><input type="text" id="in_email" style="text-transform: lowercase;"></div>
 
-                    <!-- Formas de Pagamento -->
-                    <div class="form-group full-width"><h3>Formas de Pagamento</h3></div>
-                    
-                    <!-- PIX -->
-                    <div class="form-group full-width payment-box">
-                        <label>Pix (R$)</label>
-                        <div class="payment-row">
-                            <input type="text" id="in_pix_valor" placeholder="Ex: 500,00" oninput="atualizarCalculadora()">
+                        <!-- Dados do Veículo -->
+                        <div class="form-group full-width"><h3>Dados do Veículo e Nota</h3></div>
+                        <div class="form-group"><label>Modelo do Veículo</label><input type="text" id="in_modelo" required placeholder="Ex: x12"></div>
+                        <div class="form-group"><label>Cor</label><input type="text" id="in_cor"></div>
+                        <div class="form-group"><label>Chassi</label><input type="text" id="in_chassi" required></div>
+                        <div class="form-group"><label>Motor</label><input type="text" id="in_motor" required></div>
+                        <div class="form-group"><label>Valor da Nota (R$)</label><input type="text" id="in_valor_nota" placeholder="10.990,00" oninput="atualizarCalculadora()"></div>
+
+                        <!-- Formas de Pagamento -->
+                        <div class="form-group full-width"><h3>Formas de Pagamento (Faturamento)</h3></div>
+                        
+                        <!-- PIX -->
+                        <div class="form-group full-width payment-box">
+                            <label>Pix (R$)</label>
+                            <div class="payment-row">
+                                <input type="text" id="in_pix_valor" placeholder="Ex: 500,00" oninput="atualizarCalculadora()">
+                            </div>
+                            <button type="button" class="btn-add-extra" onclick="toggleExtra('pix')">+ Adicionar acréscimo (ex: frete)</button>
+                            <div id="extra_pix" class="extra-fields">
+                                <input type="text" id="in_pix_extra_val" placeholder="Valor Adicional (Ex: 250,00)" oninput="atualizarCalculadora()">
+                                <input type="text" id="in_pix_extra_desc" placeholder="Descrição (Ex: referente ao frete)">
+                            </div>
                         </div>
-                        <button type="button" class="btn-add-extra" onclick="toggleExtra('pix')">+ Adicionar acréscimo (ex: frete)</button>
-                        <div id="extra_pix" class="extra-fields">
-                            <input type="text" id="in_pix_extra_val" placeholder="Valor Adicional (Ex: 250,00)" oninput="atualizarCalculadora()">
-                            <input type="text" id="in_pix_extra_desc" placeholder="Descrição (Ex: referente ao frete)">
+
+                        <!-- CARTÕES -->
+                        <div class="form-group full-width payment-box">
+                            <label>Cartões (Crédito / Débito)</label>
+                            <div id="lista-cartoes"></div>
+                            <button type="button" class="btn-add-extra" onclick="adicionarCartao()">+ Adicionar Cartão</button>
                         </div>
+
+                        <!-- DINHEIRO -->
+                        <div class="form-group full-width payment-box">
+                            <label>Dinheiro (R$)</label>
+                            <div class="payment-row">
+                                <input type="text" id="in_dinheiro_valor" placeholder="Ex: 0,00" oninput="atualizarCalculadora()">
+                            </div>
+                            <button type="button" class="btn-add-extra" onclick="toggleExtra('dinheiro')">+ Adicionar acréscimo (ex: frete)</button>
+                            <div id="extra_dinheiro" class="extra-fields">
+                                <input type="text" id="in_dinheiro_extra_val" placeholder="Valor Adicional" oninput="atualizarCalculadora()">
+                                <input type="text" id="in_dinheiro_extra_desc" placeholder="Descrição">
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width"><label>Resumo / Descrição de Pagamento Geral</label><input type="text" id="in_forma_pgto_geral" placeholder="Ex: cartão de credito 18x"></div>
+
+                        <!-- Logística / Frete -->
+                        <div class="form-group full-width"><h3>Logística e Entrega</h3></div>
+                        <div class="form-group full-width">
+                            <label>Tipo de Frete / Retirada</label>
+                            <select id="in_tipo_frete">
+                                <option value="cliente vai levar">Cliente vai levar</option>
+                                <option value="Frete Parceiro">Frete Parceiro</option>
+                                <option value="Frete Transportadora">Frete Transportadora</option>
+                            </select>
+                        </div>
+
+                        <!-- Checkboxes (Bonificação, Brindes, etc) -->
+                        <div class="form-group full-width"><h3>Benefícios e Adicionais</h3></div>
+                        <div class="form-group full-width checkbox-grid">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="chk_bonif" onchange="toggleBonif()">
+                                <label for="chk_bonif">Bonificação de frete</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="chk_brinde" checked>
+                                <label for="chk_brinde">Brinde</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="chk_garantia" checked>
+                                <label for="chk_garantia">Certificado de garantia</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="chk_revisao" checked>
+                                <label for="chk_revisao">1ª Revisão</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="chk_cuide" checked>
+                                <label for="chk_cuide">Guia Cuide bem</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width" id="box_bonif_valor" style="display: none; margin-top: 10px;">
+                            <label>Valor Bonificado do Frete (R$)</label>
+                            <input type="text" id="in_bonif_valor" placeholder="Ex: 250,00">
+                        </div>
+
+                        <!-- Bloco de Acessórios -->
+                        <div class="form-group full-width">
+                            <h3>Acessórios (Se houver)</h3>
+                            <div id="lista-acessorios"></div>
+                            <button type="button" class="btn-add-extra" onclick="adicionarAcessorio()">+ Adicionar Acessório</button>
+                        </div>
+                        
+                        <div class="form-group full-width"><h3>Observações Adicionais</h3></div>
+                        <div class="form-group full-width">
+                            <textarea id="in_observacao" rows="3" placeholder="Digite alguma observação sobre a venda (opcional)..."></textarea>
+                        </div>
+
+                        <button type="button" class="btn-acao full-width" onclick="gerarTextoFaturamento()" style="grid-column: 1 / -1;">Gerar Texto de Faturamento</button>
+
+                        <div class="form-group full-width">
+                            <h3>Texto Pronto para Copiar (Faturamento)</h3>
+                            <div id="preview-fat" class="preview-box">Preencha os dados e clique em "Gerar Texto"...</div>
+                            <button type="button" class="btn-acao" style="background-color: #2e7d32; margin-top: 10px;" onclick="copiarTexto('preview-fat')">Copiar Faturamento para o WhatsApp</button>
+                        </div>
+
                     </div>
+                </form>
 
-                    <!-- CARTÕES DINÂMICOS -->
-                    <div class="form-group full-width payment-box">
-                        <label>Cartões (Crédito / Débito)</label>
-                        <div id="lista-cartoes">
-                            <!-- Os cartões adicionados entram aqui -->
-                        </div>
-                        <button type="button" class="btn-add-extra" onclick="adicionarCartao()">+ Adicionar Cartão</button>
-                    </div>
-
-                    <!-- DINHEIRO -->
-                    <div class="form-group full-width payment-box">
-                        <label>Dinheiro (R$)</label>
-                        <div class="payment-row">
-                            <input type="text" id="in_dinheiro_valor" placeholder="Ex: 0,00" oninput="atualizarCalculadora()">
-                        </div>
-                        <button type="button" class="btn-add-extra" onclick="toggleExtra('dinheiro')">+ Adicionar acréscimo (ex: frete)</button>
-                        <div id="extra_dinheiro" class="extra-fields">
-                            <input type="text" id="in_dinheiro_extra_val" placeholder="Valor Adicional" oninput="atualizarCalculadora()">
-                            <input type="text" id="in_dinheiro_extra_desc" placeholder="Descrição">
-                        </div>
-                    </div>
-
-                    <div class="form-group full-width"><label>Resumo / Descrição de Pagamento Geral</label><input type="text" id="in_forma_pgto_geral" placeholder="Ex: cartão de credito 18x"></div>
-
-                    <!-- Logística / Frete -->
-                    <div class="form-group full-width"><h3>Logística e Entrega</h3></div>
-                    <div class="form-group full-width">
-                        <label>Tipo de Frete / Retirada</label>
-                        <select id="in_tipo_frete">
-                            <option value="cliente vai levar">Cliente vai levar</option>
-                            <option value="Frete Parceiro">Frete Parceiro</option>
-                            <option value="Frete Transportadora">Frete Transportadora</option>
-                        </select>
-                    </div>
-
-                    <!-- Checkboxes (Bonificação, Brindes, etc) -->
-                    <div class="form-group full-width"><h3>Benefícios e Adicionais</h3></div>
-                    <div class="form-group full-width checkbox-grid">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="chk_bonif" onchange="toggleBonif()">
-                            <label for="chk_bonif">Bonificação de frete</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="chk_brinde" checked>
-                            <label for="chk_brinde">Brinde</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="chk_garantia" checked>
-                            <label for="chk_garantia">Certificado de garantia</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="chk_revisao" checked>
-                            <label for="chk_revisao">1ª Revisão</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="chk_cuide" checked>
-                            <label for="chk_cuide">Guia Cuide bem</label>
-                        </div>
-                    </div>
-
-                    <!-- Campo Condicional de Bonificação de Frete -->
-                    <div class="form-group full-width" id="box_bonif_valor" style="display: none; margin-top: 10px;">
-                        <label>Valor Bonificado do Frete (R$)</label>
-                        <input type="text" id="in_bonif_valor" placeholder="Ex: 250,00">
-                    </div>
-
-                    <!-- Bloco de Acessórios Múltiplos -->
-                    <div class="form-group full-width">
-                        <h3>Acessórios (Se houver)</h3>
-                        <div id="lista-acessorios">
-                            <!-- Inseridos dinamicamente -->
-                        </div>
-                        <button type="button" class="btn-add-extra" onclick="adicionarAcessorio()">+ Adicionar Acessório</button>
-                    </div>
-                    
-                    <!-- Bloco de Observações -->
-                    <div class="form-group full-width"><h3>Observações Adicionais</h3></div>
-                    <div class="form-group full-width">
-                        <textarea id="in_observacao" rows="3" placeholder="Digite alguma observação sobre a venda (opcional)..."></textarea>
-                    </div>
-
-                    <button type="button" class="btn-acao full-width" onclick="gerarTexto()" style="grid-column: 1 / -1;">Gerar Texto para WhatsApp</button>
-
-                    <!-- Pré-visualização e Botão Copiar -->
-                    <div class="form-group full-width">
-                        <h3>Texto Pronto para Copiar</h3>
-                        <div id="preview-box">Preencha os dados acima e clique em "Gerar Texto"...</div>
-                        <button type="button" class="btn-acao" style="background-color: #2e7d32; margin-top: 10px;" onclick="copiarTexto()">Copiar Texto para o WhatsApp</button>
-                    </div>
-
+                <!-- Calculadora Lateral -->
+                <div class="calculator-sidebar">
+                    <div class="calc-title">Calculadora de Caixa</div>
+                    <div class="calc-row"><span>Valor da Nota:</span><span id="lbl_nota">R$ 0,00</span></div>
+                    <div class="calc-row"><span>Acessórios:</span><span id="lbl_acessorio">R$ 0,00</span></div>
+                    <div class="calc-row calc-total"><span>Total Esperado:</span><span id="lbl_total_geral" style="color: #fff;">R$ 0,00</span></div>
+                    <div style="margin: 10px 0; border-top: 1px solid var(--border-color);"></div>
+                    <div class="calc-row"><span>Total Informado:</span><span id="lbl_informado" style="color: #4caf50;">R$ 0,00</span></div>
+                    <div class="calc-row"><span>Diferença (Falta):</span><span id="lbl_falta" style="color: #ff5252;">R$ 0,00</span></div>
+                    <div id="calc_status_box" class="calc-status status-pendente">Preencha os valores...</div>
                 </div>
-            </form>
+            </div>
+        </div>
 
-            <!-- Painel da Calculadora Lateral -->
-            <div class="calculator-sidebar">
-                <div class="calc-title">Calculadora de Caixa</div>
-                
-                <div class="calc-row">
-                    <span>Valor da Nota:</span>
-                    <span id="lbl_nota">R$ 0,00</span>
-                </div>
-                <div class="calc-row">
-                    <span>Acessórios:</span>
-                    <span id="lbl_acessorio">R$ 0,00</span>
-                </div>
-                <div class="calc-row calc-total">
-                    <span>Total Esperado:</span>
-                    <span id="lbl_total_geral" style="color: #fff;">R$ 0,00</span>
-                </div>
+        <!-- CONTEÚDO SINAL -->
+        <div id="tab-sinal" class="tab-content">
+            <div class="layout-main" style="grid-template-columns: 1fr;"> <!-- Sem calculadora aqui para manter o foco no sinal -->
+                <form id="form-sinal">
+                    <div class="form-grid">
+                        
+                        <!-- Obs do Sinal -->
+                        <div class="form-group full-width" style="background: rgba(211, 47, 47, 0.1); padding: 15px; border-radius: 6px; border: 1px solid var(--primary-red);">
+                            <label style="color: #fff;">SINAL: [ OBS SOBRE O QUE É O SINAL ]</label>
+                            <input type="text" id="sin_obs_sinal" required placeholder="Ex: Reserva de moto x12 vermelha...">
+                        </div>
 
-                <div style="margin: 10px 0; border-top: 1px solid var(--border-color);"></div>
+                        <!-- Vendedor -->
+                        <div class="form-group full-width"><label>Vendedor (Seu Nome)</label><input type="text" id="sin_vendedor" required placeholder="Ex: Alan"></div>
 
-                <div class="calc-row">
-                    <span>Total Informado:</span>
-                    <span id="lbl_informado" style="color: #4caf50;">R$ 0,00</span>
-                </div>
-                <div class="calc-row">
-                    <span>Diferença (Falta):</span>
-                    <span id="lbl_falta" style="color: #ff5252;">R$ 0,00</span>
-                </div>
+                        <!-- Dados do Cliente -->
+                        <div class="form-group full-width"><h3>Dados do Cliente</h3></div>
+                        <div class="form-group"><label>CEP</label><input type="text" id="sin_cep" placeholder="00000-000" maxlength="9" onblur="consultarCep('sin')"></div>
+                        <div class="form-group"><label>Estado (UF)</label><input type="text" id="sin_estado" maxlength="2"></div>
+                        <div class="form-group"><label>Cidade</label><input type="text" id="sin_cidade"></div>
+                        <div class="form-group"><label>Bairro</label><input type="text" id="sin_bairro"></div>
+                        <div class="form-group full-width"><label>Endereço (Rua e Nº)</label><input type="text" id="sin_endereco" placeholder="Digite a rua e o número"></div>
+                        
+                        <div class="form-group full-width"><label>Nome Completo</label><input type="text" id="sin_nome" required></div>
+                        <div class="form-group"><label>CPF</label><input type="text" id="sin_cpf" required></div>
+                        <div class="form-group"><label>RG</label><input type="text" id="sin_rg"></div>
+                        <div class="form-group"><label>Data de Nascimento</label><input type="text" id="sin_nascimento" placeholder="DD/MM/AAAA"></div>
+                        <div class="form-group"><label>Telefone</label><input type="text" id="sin_telefone" placeholder="(44) 99999-9999"></div>
+                        <div class="form-group"><label>E-mail</label><input type="text" id="sin_email" style="text-transform: lowercase;"></div>
 
-                <div id="calc_status_box" class="calc-status status-pendente">
-                    Preencha os valores...
-                </div>
+                        <!-- Dados do Veículo -->
+                        <div class="form-group full-width"><h3>Dados do Veículo e Nota</h3></div>
+                        <div class="form-group"><label>Modelo do Veículo</label><input type="text" id="sin_modelo" required placeholder="Ex: x12"></div>
+                        <div class="form-group"><label>Cor</label><input type="text" id="sin_cor"></div>
+                        
+                        <!-- Checkbox SEM ESTOQUE -->
+                        <div class="form-group full-width checkbox-destaque checkbox-item">
+                            <input type="checkbox" id="sin_chk_estoque" onchange="toggleEstoque()">
+                            <label for="sin_chk_estoque" style="font-weight: bold; font-size: 14px; color: var(--primary-red);">SEM ESTOQUE (Marque se aguardando chegada, bloqueará chassi e motor)</label>
+                        </div>
+
+                        <div class="form-group"><label>Chassi</label><input type="text" id="sin_chassi" required></div>
+                        <div class="form-group"><label>Motor</label><input type="text" id="sin_motor" required></div>
+                        <div class="form-group full-width"><label>Valor da Nota (R$)</label><input type="text" id="sin_valor_nota" placeholder="10.990,00"></div>
+
+                        <!-- Formas de Pagamento Sinal -->
+                        <div class="form-group full-width"><h3>Pagamento do Sinal (Data Obrigatória)</h3></div>
+                        <div class="form-group full-width"><label>Resumo / Descrição de Pagamento Geral</label><input type="text" id="sin_forma_pgto_geral" placeholder="Ex: 50% no pix e resto na entrega"></div>
+                        
+                        <!-- PIX Sinal -->
+                        <div class="form-group full-width payment-box">
+                            <label>Pix (R$)</label>
+                            <div class="payment-row">
+                                <input type="text" id="sin_pix_val" placeholder="Valor (Ex: 500,00)">
+                                <div style="display: flex; flex-direction: column; width: 100%;">
+                                    <label style="font-size: 10px;">Data do Pix</label>
+                                    <input type="date" id="sin_pix_data">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CARTÃO Sinal -->
+                        <div class="form-group full-width payment-box">
+                            <label>Cartão (R$)</label>
+                            <div class="payment-row">
+                                <input type="text" id="sin_cartao_val" placeholder="Valor (Ex: 500,00)">
+                                <div style="display: flex; flex-direction: column; width: 100%;">
+                                    <label style="font-size: 10px;">Data do Cartão</label>
+                                    <input type="date" id="sin_cartao_data">
+                                </div>
+                            </div>
+                            <div class="payment-row" style="margin-top: 5px;">
+                                <input type="text" id="sin_cartao_detalhe" placeholder="Detalhe (Ex: Crédito 2x)">
+                            </div>
+                        </div>
+
+                        <!-- DINHEIRO Sinal -->
+                        <div class="form-group full-width payment-box">
+                            <label>Dinheiro (R$)</label>
+                            <div class="payment-row">
+                                <input type="text" id="sin_dinheiro_val" placeholder="Valor (Ex: 500,00)">
+                                <div style="display: flex; flex-direction: column; width: 100%;">
+                                    <label style="font-size: 10px;">Data do Dinheiro</label>
+                                    <input type="date" id="sin_dinheiro_data">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-acao full-width" onclick="gerarTextoSinal()" style="grid-column: 1 / -1;">Gerar Texto de Sinal</button>
+
+                        <div class="form-group full-width">
+                            <h3>Texto Pronto para Copiar (Sinal)</h3>
+                            <div id="preview-sinal" class="preview-box">Preencha os dados e clique em "Gerar Texto"...</div>
+                            <button type="button" class="btn-acao" style="background-color: #2e7d32; margin-top: 10px;" onclick="copiarTexto('preview-sinal')">Copiar Sinal para o WhatsApp</button>
+                        </div>
+
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
 <script>
-    // Gerenciador de Múltiplos Cartões
+    // --- NAVEGAÇÃO DE ABAS ---
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        if(tabName === 'faturamento') {
+            document.getElementById('btn-fat').classList.add('active');
+            document.getElementById('tab-faturamento').classList.add('active');
+        } else {
+            document.getElementById('btn-sinal').classList.add('active');
+            document.getElementById('tab-sinal').classList.add('active');
+        }
+    }
+
+    // --- FUNÇÕES GERAIS ---
+    async function consultarCep(prefixo) {
+        let cep = document.getElementById(prefixo === 'fat' ? 'in_cep' : 'sin_cep').value.replace(/\D/g, '');
+        if (cep.length !== 8) return;
+
+        try {
+            let resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            let dados = await resposta.json();
+
+            if (!dados.erro) {
+                if(prefixo === 'fat') {
+                    document.getElementById('in_estado').value = dados.uf || '';
+                    document.getElementById('in_cidade').value = dados.localidade || '';
+                    document.getElementById('in_bairro').value = dados.bairro || '';
+                    document.getElementById('in_endereco').value = dados.logradouro ? `${dados.logradouro}, ` : '';
+                    document.getElementById('in_endereco').focus();
+                } else {
+                    document.getElementById('sin_estado').value = dados.uf || '';
+                    document.getElementById('sin_cidade').value = dados.localidade || '';
+                    document.getElementById('sin_bairro').value = dados.bairro || '';
+                    document.getElementById('sin_endereco').value = dados.logradouro ? `${dados.logradouro}, ` : '';
+                    document.getElementById('sin_endereco').focus();
+                }
+            } else {
+                alert('CEP não encontrado.');
+            }
+        } catch (erro) {
+            console.error('Erro ao buscar CEP:', erro);
+        }
+    }
+
+    function copiarTexto(boxId) {
+        const texto = document.getElementById(boxId).textContent;
+        if (!texto || texto.startsWith('Preencha')) {
+            alert('Por favor, gere o texto primeiro.');
+            return;
+        }
+        navigator.clipboard.writeText(texto).then(() => {
+            alert('Texto copiado com sucesso! Cole no WhatsApp.');
+        }).catch(err => {
+            alert('Erro ao copiar texto.');
+        });
+    }
+
+    function formataDataBR(dataIso) {
+        if(!dataIso) return "";
+        let partes = dataIso.split('-');
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
+    // --- LÓGICA DO FATURAMENTO ---
     function adicionarCartao() {
         const container = document.getElementById('lista-cartoes');
         const div = document.createElement('div');
@@ -561,18 +771,17 @@
         atualizarCalculadora();
     }
 
-    // Gerenciador de Múltiplos Acessórios
     function adicionarAcessorio() {
         const container = document.getElementById('lista-acessorios');
         const div = document.createElement('div');
         div.className = 'acessorio-bloco';
         div.innerHTML = `
             <div class="form-grid">
-                <div class="form-group"><label>Nome do Acessório</label><input type="text" class="ac_nome" placeholder="Ex: Cadeirinha"></div>
+                <div class="form-group"><label>Nome</label><input type="text" class="ac_nome" placeholder="Ex: Cadeirinha"></div>
                 <div class="form-group"><label>Cor</label><input type="text" class="ac_cor" placeholder="Ex: Preto"></div>
-                <div class="form-group"><label>Tamanho</label><input type="text" class="ac_tam" placeholder="Ex: Único"></div>
-                <div class="form-group"><label>Valor (R$)</label><input type="text" class="ac_val" placeholder="Ex: 649,90" oninput="atualizarCalculadora()"></div>
-                <div class="form-group full-width"><label>Forma de Pagamento</label><input type="text" class="ac_pgto" placeholder="Ex: parcelado em 18x"></div>
+                <div class="form-group"><label>Tam.</label><input type="text" class="ac_tam" placeholder="Ex: Único"></div>
+                <div class="form-group"><label>Valor</label><input type="text" class="ac_val" placeholder="Ex: 649,90" oninput="atualizarCalculadora()"></div>
+                <div class="form-group full-width"><label>Pgto.</label><input type="text" class="ac_pgto" placeholder="Ex: parcelado 18x"></div>
             </div>
             <button type="button" class="btn-remover-cartao" style="margin-top:8px; width:100%; padding:8px;" onclick="removerAcessorio(this)">Remover Acessório</button>
         `;
@@ -597,26 +806,18 @@
 
     function atualizarCalculadora() {
         let nota = converterMoeda(document.getElementById('in_valor_nota').value);
-        
         let totalAcessorios = 0;
-        document.querySelectorAll('.ac_val').forEach(input => {
-            totalAcessorios += converterMoeda(input.value);
-        });
+        document.querySelectorAll('.ac_val').forEach(input => { totalAcessorios += converterMoeda(input.value); });
 
         let totalEsperado = nota + totalAcessorios;
 
-        // Soma Pix e Dinheiro
         let pix = converterMoeda(document.getElementById('in_pix_valor').value);
         let pixExtra = converterMoeda(document.getElementById('in_pix_extra_val').value);
         let dinheiro = converterMoeda(document.getElementById('in_dinheiro_valor').value);
         let dinheiroExtra = converterMoeda(document.getElementById('in_dinheiro_extra_val').value);
 
-        // Soma Cartões dinâmicos
         let totalCartoes = 0;
-        document.querySelectorAll('.cartao-item').forEach(item => {
-            let val = converterMoeda(item.querySelector('.cartao-val').value);
-            totalCartoes += val;
-        });
+        document.querySelectorAll('.cartao-item').forEach(item => { totalCartoes += converterMoeda(item.querySelector('.cartao-val').value); });
 
         let totalInformado = pix + pixExtra + dinheiro + dinheiroExtra + totalCartoes;
         let diferenca = totalEsperado - totalInformado;
@@ -643,7 +844,7 @@
         } else if (diferenca < 0) {
             lblFalta.textContent = formatarMoeda(0);
             statusBox.className = "calc-status status-ok";
-            statusBox.textContent = `✅ QUITADO (Excesso/Troco: ${formatarMoeda(Math.abs(diferenca))})`;
+            statusBox.textContent = `✅ QUITADO (Troco: ${formatarMoeda(Math.abs(diferenca))})`;
         } else {
             lblFalta.textContent = "R$ 0,00";
             statusBox.className = "calc-status status-ok";
@@ -651,41 +852,15 @@
         }
     }
 
-    async function consultarCep() {
-        let cep = document.getElementById('in_cep').value.replace(/\D/g, '');
-        if (cep.length !== 8) return;
-
-        try {
-            let resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-            let dados = await resposta.json();
-
-            if (!dados.erro) {
-                document.getElementById('in_estado').value = dados.uf || '';
-                document.getElementById('in_cidade').value = dados.localidade || '';
-                document.getElementById('in_bairro').value = dados.bairro || '';
-                let ruaCompleta = dados.logradouro ? `${dados.logradouro}, ` : '';
-                document.getElementById('in_endereco').value = ruaCompleta;
-                document.getElementById('in_endereco').focus();
-            } else {
-                alert('CEP não encontrado.');
-            }
-        } catch (erro) {
-            console.error('Erro ao buscar CEP:', erro);
-        }
-    }
-
     function toggleExtra(tipo) {
-        const el = document.getElementById(`extra_${tipo}`);
-        el.classList.toggle('active');
+        document.getElementById(`extra_${tipo}`).classList.toggle('active');
     }
 
     function toggleBonif() {
-        const chk = document.getElementById('chk_bonif').checked;
-        const box = document.getElementById('box_bonif_valor');
-        box.style.display = chk ? 'flex' : 'none';
+        document.getElementById('box_bonif_valor').style.display = document.getElementById('chk_bonif').checked ? 'flex' : 'none';
     }
 
-    function formatarPagamento(campoValor, campoExtraVal, campoExtraDesc) {
+    function formatarPagamentoFat(campoValor, campoExtraVal, campoExtraDesc) {
         let val = document.getElementById(campoValor).value.trim();
         let extraVal = document.getElementById(campoExtraVal).value.trim();
         let extraDesc = document.getElementById(campoExtraDesc).value.trim();
@@ -699,9 +874,9 @@
         return texto;
     }
 
-    function gerarTexto() {
+    function gerarTextoFaturamento() {
         const vendedor = document.getElementById('in_vendedor').value.toUpperCase();
-        const loja = document.getElementById('in_loja').value;
+        // Loja removida conforme pedido original
         const nome = document.getElementById('in_nome').value.toUpperCase();
         const cpf = document.getElementById('in_cpf').value;
         const rg = document.getElementById('in_rg').value;
@@ -720,24 +895,22 @@
         const valorNota = document.getElementById('in_valor_nota').value;
         const formaPgtoGeral = document.getElementById('in_forma_pgto_geral').value.toLowerCase();
         
-        const pixStr = formatarPagamento('in_pix_valor', 'in_pix_extra_val', 'in_pix_extra_desc');
-        const dinheiroStr = formatarPagamento('in_dinheiro_valor', 'in_dinheiro_extra_val', 'in_dinheiro_extra_desc');
+        const pixStr = formatarPagamentoFat('in_pix_valor', 'in_pix_extra_val', 'in_pix_extra_desc');
+        const dinheiroStr = formatarPagamentoFat('in_dinheiro_valor', 'in_dinheiro_extra_val', 'in_dinheiro_extra_desc');
 
-        // Montagem do formato de cartões dinâmicos solicitados
         let cartoesArray = [];
         document.querySelectorAll('.cartao-item').forEach(item => {
             let val = item.querySelector('.cartao-val').value.trim();
             let tipo = item.querySelector('.cartao-tipo').value;
             let parcInput = item.querySelector('.cartao-parc').value.trim();
-
             if (val) {
                 let numVal = converterMoeda(val);
                 if (tipo === 'DÉBITO') {
-                    cartoesArray.push(`${val} DÉBITO`);
+                    cartoesArray.push(`R$ ${val} DÉBITO`);
                 } else {
                     let numParc = parseInt(parcInput.replace(/\D/g, '')) || 1;
                     let valorParcela = (numVal / numParc).toFixed(2).replace('.', ',');
-                    cartoesArray.push(`${val} | ${numParc}x de ${valorParcela}`);
+                    cartoesArray.push(`R$ ${val} | ${numParc}x de R$ ${valorParcela}`);
                 }
             }
         });
@@ -750,7 +923,7 @@
 
         const chkBonif = document.getElementById('chk_bonif').checked;
         const valBonif = document.getElementById('in_bonif_valor').value.trim();
-        let bonifTexto = chkBonif ? (valBonif ? `Sim, ${valBonif} bonificado referente ao frete` : "sim") : "não";
+        let bonifTexto = chkBonif ? (valBonif ? `Sim, R$ ${valBonif} bonificado referente ao frete` : "sim") : "não";
 
         const brinde = document.getElementById('chk_brinde').checked ? "sim" : "não";
         const garantia = document.getElementById('chk_garantia').checked ? "sim" : "não";
@@ -758,8 +931,7 @@
         const cuide = document.getElementById('chk_cuide').checked ? "sim" : "não";
         const observacao = document.getElementById('in_observacao').value.trim();
 
-        let textoFinal = `${loja}
-Nome completo: ${nome}
+        let textoFinal = `Nome completo: ${nome}
 CPF : ${cpf}
 RG: ${rg}
 data de nascimento: ${nascimento}
@@ -787,43 +959,113 @@ Certificado de garantia: ${garantia}
 Cuide bem: ${cuide}
 Vendedor: ${vendedor}`;
 
-        // Adiciona múltiplos acessórios se houver
         document.querySelectorAll('.acessorio-bloco').forEach(bloco => {
             let acNome = bloco.querySelector('.ac_nome').value.toUpperCase();
-            let acCor = bloco.querySelector('.ac_cor').value.toUpperCase();
-            let acTam = bloco.querySelector('.ac_tam').value.toUpperCase();
-            let acVal = bloco.querySelector('.ac_val').value.trim();
-            let acPgto = bloco.querySelector('.ac_pgto').value.toLowerCase();
-
             if (acNome) {
                 textoFinal += `\n\nNome: ${nome.split(' ')[0]}
 acessorio: ${acNome}
-cor: ${acCor}
-tamanho: ${acTam}
-valor: R$ ${acVal}
-forma de pagamento: ${acPgto}
+cor: ${bloco.querySelector('.ac_cor').value.toUpperCase()}
+tamanho: ${bloco.querySelector('.ac_tam').value.toUpperCase()}
+valor: R$ ${bloco.querySelector('.ac_val').value.trim()}
+forma de pagamento: ${bloco.querySelector('.ac_pgto').value.toLowerCase()}
 vendedor: ${vendedor}`;
             }
         });
 
-        if (observacao) {
-            textoFinal += `\n\nObservação: ${observacao}`;
-        }
-
-        document.getElementById('preview-box').textContent = textoFinal;
+        if (observacao) textoFinal += `\n\nObservação: ${observacao}`;
+        document.getElementById('preview-fat').textContent = textoFinal;
     }
 
-    function copiarTexto() {
-        const texto = document.getElementById('preview-box').textContent;
-        if (!texto || texto.startsWith('Preencha')) {
-            alert('Por favor, clique em "Gerar Texto para WhatsApp" primeiro.');
-            return;
+    // --- LÓGICA DO SINAL ---
+    function toggleEstoque() {
+        const isChecked = document.getElementById('sin_chk_estoque').checked;
+        const chassi = document.getElementById('sin_chassi');
+        const motor = document.getElementById('sin_motor');
+        
+        if(isChecked) {
+            chassi.disabled = true;
+            chassi.value = "[ AGUARDANDO CHEGADA EM ESTOQUE ]";
+            motor.disabled = true;
+            motor.value = "[ AGUARDANDO CHEGADA EM ESTOQUE ]";
+        } else {
+            chassi.disabled = false;
+            chassi.value = "";
+            motor.disabled = false;
+            motor.value = "";
         }
-        navigator.clipboard.writeText(texto).then(() => {
-            alert('Texto copiado com sucesso para a área de transferência! Cole no WhatsApp.');
-        }).catch(err => {
-            alert('Erro ao copiar texto.');
-        });
+    }
+
+    function gerarTextoSinal() {
+        // Validação das datas de pagamento exigidas
+        const pixVal = document.getElementById('sin_pix_val').value.trim();
+        const pixData = document.getElementById('sin_pix_data').value;
+        if(pixVal && !pixData) { alert("SINAL: Você informou um valor em PIX. É obrigatório informar a Data do Pix."); return; }
+
+        const cartaoVal = document.getElementById('sin_cartao_val').value.trim();
+        const cartaoData = document.getElementById('sin_cartao_data').value;
+        if(cartaoVal && !cartaoData) { alert("SINAL: Você informou um valor em Cartão. É obrigatório informar a Data do Cartão."); return; }
+
+        const dinheiroVal = document.getElementById('sin_dinheiro_val').value.trim();
+        const dinheiroData = document.getElementById('sin_dinheiro_data').value;
+        if(dinheiroVal && !dinheiroData) { alert("SINAL: Você informou um valor em Dinheiro. É obrigatório informar a Data do Dinheiro."); return; }
+
+        const obsSinal = document.getElementById('sin_obs_sinal').value.toUpperCase();
+        const nome = document.getElementById('sin_nome').value.toUpperCase();
+        const cpf = document.getElementById('sin_cpf').value;
+        const rg = document.getElementById('sin_rg').value;
+        const nascimento = document.getElementById('sin_nascimento').value;
+        const telefone = document.getElementById('sin_telefone').value;
+        const cidade = document.getElementById('sin_cidade').value.toUpperCase();
+        const endereco = document.getElementById('sin_endereco').value.toUpperCase();
+        const bairro = document.getElementById('sin_bairro').value.toUpperCase();
+        const estado = document.getElementById('sin_estado').value.toUpperCase();
+        const cep = document.getElementById('sin_cep').value;
+        const email = document.getElementById('sin_email').value;
+        const modelo = document.getElementById('sin_modelo').value.toUpperCase();
+        const cor = document.getElementById('sin_cor').value.toUpperCase();
+        const chassi = document.getElementById('sin_chassi').value.toUpperCase();
+        const motor = document.getElementById('sin_motor').value.toUpperCase();
+        const valorNota = document.getElementById('sin_valor_nota').value;
+        const formaPgtoGeral = document.getElementById('sin_forma_pgto_geral').value.toLowerCase();
+        const vendedor = document.getElementById('sin_vendedor').value.toUpperCase();
+
+        // Construção das strings de pagamento com data
+        let dinheiroStr = dinheiroVal ? `R$ ${dinheiroVal} (Data: ${formataDataBR(dinheiroData)})` : "";
+        let pixStr = pixVal ? `R$ ${pixVal} (Data: ${formataDataBR(pixData)})` : "";
+        
+        let cartaoDetalhe = document.getElementById('sin_cartao_detalhe').value.trim();
+        let cartaoStr = "";
+        if(cartaoVal) {
+            cartaoStr = `R$ ${cartaoVal} `;
+            if(cartaoDetalhe) cartaoStr += `- ${cartaoDetalhe} `;
+            cartaoStr += `(Data: ${formataDataBR(cartaoData)})`;
+        }
+
+        let textoFinal = `SINAL: [ ${obsSinal} ]
+
+Nome completo: ${nome}
+CPF : ${cpf}
+RG: ${rg}
+data de nascimento: ${nascimento}
+telefone : ${telefone}
+cidade: ${cidade}
+endereço com nº: ${endereco}
+Bairro: ${bairro}
+estado: ${estado}
+CEP : ${cep}
+email : ${email}
+Modelo: ${modelo}
+Cor: ${cor}
+Chassi: ${chassi}
+Motor: ${motor}
+Valor de nota: R$ ${valorNota}
+Forma de pagamento: ${formaPgtoGeral}
+Dinheiro: ${dinheiroStr}
+Cartão: ${cartaoStr}
+Pix: ${pixStr}
+Vendedor: ${vendedor}`;
+
+        document.getElementById('preview-sinal').textContent = textoFinal;
     }
 </script>
 </body>
