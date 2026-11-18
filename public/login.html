@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4c400">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23111%27/%3E%3Ctext x=%2732%27 y=%2744%27 font-family=%27Arial%27 font-weight=%27900%27 font-size=%2730%27 text-anchor=%27middle%27 fill=%27%23f4c400%27%3EMC%3C/text%3E%3C/svg%3E">
+<title>Entrar — Rotas de Entrega</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body class="login-page">
+  <div class="login-wrap">
+    <div class="login-art">
+      <div class="logo-box"><div class="logo-fallback">Moto Chefe<small>Maringá</small></div></div>
+      <h1>Entregas na <em>ordem certa</em>,<br>com o custo de cada viagem.</h1>
+      <ul>
+        <li>Melhor ordem das entregas, calculada pelas ruas</li>
+        <li>Link pronto do Google Maps para o entregador</li>
+        <li>Gasto de combustível por rota e relatório do mês</li>
+      </ul>
+    </div>
+    <form class="login-card" id="f" autocomplete="on">
+      <h2>Entrar</h2>
+      <p class="muted">Use o usuário e a senha cadastrados pelo administrador.</p>
+      <label>Usuário<input name="username" autocomplete="username" required autofocus></label>
+      <label>Senha<input name="password" type="password" autocomplete="current-password" required></label>
+      <div class="err" id="err"></div>
+      <button class="btn green lg block" id="go">Entrar</button>
+    </form>
+  </div>
+<script>
+document.getElementById('f').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const b = document.getElementById('go'), err = document.getElementById('err');
+  b.disabled = true; err.textContent = '';
+  const fd = new FormData(e.target);
+  try {
+    const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(fd)) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Não foi possível entrar');
+    location.href = '/';
+  } catch (x) { err.textContent = x.message; b.disabled = false; }
+});
+</script>
+</body>
+</html>

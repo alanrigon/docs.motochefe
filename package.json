@@ -1,0 +1,16 @@
+{
+  "name": "rotas-motochefe",
+  "version": "1.0.0",
+  "description": "Planejador de rotas de entrega com custo por scooter elétrica — Moto Chefe Maringá",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "DEMO=1 node src/server.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

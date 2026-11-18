@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4c400">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23111%27/%3E%3Ctext x=%2732%27 y=%2744%27 font-family=%27Arial%27 font-weight=%27900%27 font-size=%2730%27 text-anchor=%27middle%27 fill=%27%23f4c400%27%3EMC%3C/text%3E%3C/svg%3E">
+<title>Rotas de Entrega — Moto Chefe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <aside class="side">
+    <div class="logo-box"><div class="logo-fallback">Moto Chefe<small>Maringá</small></div></div>
+    <div class="logo-sub">Rotas de entrega<span id="company" hidden></span></div>
+    <nav id="nav"></nav>
+    <div class="me">
+      <div class="avatar" id="avatar"></div>
+      <div><b id="meName"></b><span id="meRole"></span></div>
+      <button class="icon-btn" id="logout" title="Sair">Sair</button>
+    </div>
+  </aside>
+  <main id="view"></main>
+  <div id="modal" class="modal" hidden><div class="modal-box" id="modalBox"></div></div>
+  <div id="toast" class="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
